@@ -1,0 +1,10 @@
+# Test creating a user profile
+curl -X POST http://localhost:8000/app/create_user_profile/ \
+  -d "user_id=some_user_id&email=user@example.com&first_name=John&last_name=Doe"
+
+# Test getting all users
+curl -X GET http://localhost:8000/app/get_all_users/
+
+# Test updating a user profile using PUT
+curl -X PUT http://localhost:8000/app/update_user_profile/some_user_id/ \
+  -d "first_name=Jane&last_name=Smith"
