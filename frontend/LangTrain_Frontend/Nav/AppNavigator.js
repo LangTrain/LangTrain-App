@@ -6,7 +6,9 @@ import SignupScreen from "../Pages/Auth/Signup";
 import HomeScreen from "../Pages/HomeScreen";
 import EmailVerification from "../Pages/Auth/EmailVerfication";
 import ForgotPassword from "../Pages/Auth/ForgotPassword.tsx";
-
+import QuizLevel from "../Pages/Quiz/QuizLevel";
+import Quiz from "../Pages/Quiz/Quiz";
+import Result from "../Pages/Quiz/Result";
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -36,6 +38,21 @@ const AppNavigator = () => {
         <Stack.Screen
           name="EmailVerification"
           component={EmailVerification}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="QuizLevel"
+          component={QuizLevel}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Quiz"
+          component={Quiz}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Result"
+          component={Result}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

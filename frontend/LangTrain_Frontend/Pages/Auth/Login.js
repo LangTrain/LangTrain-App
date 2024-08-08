@@ -8,6 +8,7 @@ import {
   ScrollView,
   Alert,
   SafeAreaView,
+  Pressable,
 } from "react-native";
 import { useAuth } from "../../hooks/AuthProvider.tsx";
 import GoogleSignInButton from "../../Components/GoogleSignIn";
@@ -91,6 +92,13 @@ const LoginScreen = ({ navigation }) => {
               New user? Sign Up
             </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate("QuizLevel")}>
+            <Text className="text-lg text-black-500 mt-2 bg-blue-300 p-2">
+              Quiz Time
+            </Text>
+          </TouchableOpacity>
+
         </View>
       </ScrollView>
     </SafeAreaView>
