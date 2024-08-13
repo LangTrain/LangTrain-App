@@ -3,53 +3,74 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import HomeScreen from "../Pages/HomeScreen";
-import One from "../Pages/Tabs/One";
-import Two from "../Pages/Tabs/Two";
-import Three from "../Pages/Tabs/Three";
+import Community from "../Pages/Tabs/Community";
+import Profile from "../Pages/Tabs/Profile";
+import Quizzes from "../Pages/Tabs/Quizzes";
+import Lessons from "../Pages/Tabs/Lessons";
 
 const Tab = createBottomTabNavigator();
+const tabScreens = [
+  {
+    name: "LangTrain",
+    component: HomeScreen,
+    label: "LangTrain",
+    icon: "owl",
+  },
+
+  {
+    name: "Lessons",
+    component: Lessons,
+    label: "Lessons",
+    icon: "school",
+  },
+  {
+    name: "Quizzes",
+    component: Quizzes,
+    label: "Quizzes",
+    icon: "all-inclusive-box",
+  },
+  {
+    name: "Community",
+    component: Community,
+    label: "Community",
+    icon: "chat-processing",
+  },
+  {
+    name: "Profile",
+    component: Profile,
+    label: "Profile",
+    icon: "account",
+  },
+  // Add more screens here as needed
+];
 
 const BottomTabsNavigator = () => {
   return (
     <Tab.Navigator
-      initialRouteName="Home"
+      initialRouteName="HomeScreen"
       screenOptions={{
         tabBarActiveTintColor: "#e91e63",
       }}
     >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          tabBarLabel: "Home",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="One"
-        component={One}
-        options={{
-          tabBarLabel: "Updates",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="bell" color={color} size={size} />
-          ),
-          tabBarBadge: 3,
-        }}
-      />
-      <Tab.Screen
-        name="Two"
-        component={Two}
-        options={{
-          tabBarLabel: "Profile",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account" color={color} size={size} />
-          ),
-        }}
-      />
+      {tabScreens.map((screen, index) => (
+        <Tab.Screen
+          key={index}
+          name={screen.name}
+          component={screen.component}
+          options={{
+            tabBarLabel: screen.label,
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name={screen.icon}
+                color={color}
+                size={size}
+              />
+            ),
+            headerShown: false,
+          }}
+        />
+      ))}
     </Tab.Navigator>
   );
 };
-
 export default BottomTabsNavigator;

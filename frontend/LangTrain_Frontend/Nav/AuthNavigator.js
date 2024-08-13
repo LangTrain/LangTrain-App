@@ -6,30 +6,25 @@ import SignupScreen from "../Pages/Auth/Signup";
 import ForgotPassword from "../Pages/Auth/ForgotPassword";
 import EmailVerification from "../Pages/Auth/EmailVerfication";
 
+const pages = [
+  { name: "Login", component: LoginScreen },
+  { name: "Signup", component: SignupScreen },
+  { name: "ForgotPassword", component: ForgotPassword },
+  { name: "EmailVerification", component: EmailVerification },
+];
+
 const Stack = createStackNavigator();
 const AuthNavigator = () => {
   return (
     <Stack.Navigator initialRouteName="Login">
-      <Stack.Screen
-        name="Login"
-        component={LoginScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Signup"
-        component={SignupScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ForgotPassword"
-        component={ForgotPassword}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="EmailVerification"
-        component={EmailVerification}
-        options={{ headerShown: false }}
-      />
+      {pages.map((pages, index) => (
+        <Stack.Screen
+          key={index}
+          name={pages.name}
+          component={pages.component}
+          options={{ headerShown: false }}
+        />
+      ))}
     </Stack.Navigator>
   );
 };
