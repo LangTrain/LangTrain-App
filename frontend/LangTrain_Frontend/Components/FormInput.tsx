@@ -47,7 +47,6 @@ const FormInput: React.FC<FormInputProps> = ({
             (title === "Password" || placeholder === "confirm password") &&
             !showPassword
           }
-          {...props}
         />
 
         {isPasswordField && (

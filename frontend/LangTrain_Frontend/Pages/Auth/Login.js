@@ -30,7 +30,6 @@ const LoginScreen = ({ navigation }) => {
     try {
       await signIn("email", { email: form.email, password: form.password });
       Alert.alert("User signed in successfully!");
-      navigation.navigate("Home");
     } catch (error) {
       Alert.alert(error.message);
     }

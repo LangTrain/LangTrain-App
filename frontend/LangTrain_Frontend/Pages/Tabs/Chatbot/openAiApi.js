@@ -1,5 +1,5 @@
 // openAiApi.js
-import { OPENAI_API_KEY } from "../../env";
+import { OPENAI_API_KEY } from "../../../env";
 import axios from "axios";
 
 export const fetchOpenAiResponse = async (userMessage, language, level) => {

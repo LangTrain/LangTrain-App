@@ -119,8 +119,8 @@ const Chatbot = () => {
                   <Image
                     source={
                       message.role === "assistant"
-                        ? require("../../assets/lt-owl.png")
-                        : require("../../assets/user.png")
+                        ? require("../../../assets/lt-owl.png")
+                        : require("../../../assets/user.png")
                     }
                     className="w-8 h-8 rounded-full"
                   />
