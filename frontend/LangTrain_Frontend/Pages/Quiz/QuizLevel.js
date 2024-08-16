@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View, Pressable } from 'react-native';
+import { db } from '../../firebase';
 
 export default function QuizLevel({ navigation }) {
 

@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
-import questionBank from '../../questionBank';
+// import questionBank from '../../questionBank';
 import { useRoute } from '@react-navigation/native';
-
+import { db } from '../../firebase';
+import { collection, getDocs, addDoc, doc, setDoc, deleteDoc } from 'firebase/firestore';
 /**
  * You can access this actuaL Quiz page by pressing 
  * the "Quiz time" button in login page.
@@ -19,6 +20,8 @@ import { useRoute } from '@react-navigation/native';
  * 2) after the quiz in the result screen, add button to view all mistakes VS answers
  * 3) change all styles to nativeWind
  */
+
+
 export default function Quiz({ navigation }) {
     const route = useRoute();
     const { difficulty } = route.params;
@@ -32,14 +35,54 @@ export default function Quiz({ navigation }) {
     const [firstSel, setFirstSel] = useState(true);
     const [score, setScore] = useState(0);
 
+    const [questionBank, setQuestionBank] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    // fetch proper difficulty as needed
+    const fetchQuestion = async () => {
+        try {
+            setLoading(true);
+            const quizQuestionCollectionRef = collection(db, 'quizBank', difficulty, 'quizQuestion');
+            const querySnapshot = await getDocs(quizQuestionCollectionRef);
+            const questions = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+            }));
+
+            // console.log(questions)
+            setQuestionBank(questions)
+
+            // load in the first question on the screen
+            let ques = questions[0].question;
+            setCurQues(ques);
+            let options = questions[0].options;
+            setCurOptions(options);
+            let ans = questions[0].correctAnswer;
+            setCurAns(ans);
+
+        } catch (e) {
+            console.error("Error fetching quiz data: ", e);
+        } finally {
+            setLoading(false);
+        }
+        
+    }
+
     useEffect(() => {
-        let ques = questionBank[index].question;
-        setCurQues(ques);
-        let options = questionBank[index].options;
-        setCurOptions(options);
-        let ans = questionBank[index].correctAnswer;
-        setCurAns(ans);
+        if(questionBank){
+            let ques = questionBank[index].question;
+            setCurQues(ques);
+            let options = questionBank[index].options;
+            setCurOptions(options);
+            let ans = questionBank[index].correctAnswer;
+            setCurAns(ans);
+        }
+        
     }, [index]);
+
+    useEffect(() => {
+        fetchQuestion();
+    }, [])
 
     const handleOptionPress = (option) => {
         // console.log(`Selected option: ${option}`);
@@ -75,25 +118,31 @@ export default function Quiz({ navigation }) {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>{difficulty} Mode</Text>
+            {
+                loading ? (<View><Text>loading</Text></View>) :(
+                    <>
+                        <Text style={styles.question}>{curQues}</Text>
             
-            <Text style={styles.question}>{curQues}</Text>
+                        <View style={styles.optionsContainer}>
+                            {curOptions.map((op, idx) => (
+                                <Pressable 
+                                    key={idx} 
+                                    style={[
+                                        styles.optionButton, 
+                                        (selected === op && correct) && styles.correctButton,
+                                        (selected === op && !correct) && styles.incorrectButton,
+                                        { opacity: (selected === op) ? 0.5 : 1 }
+                                    ]}
+                                    onPress={() => handleOptionPress(op)}
+                                >
+                                    <Text style={styles.optionText}>{op}</Text>
+                                </Pressable>
+                            ))}
+                        </View>
+                    </>
+                )
+            }
             
-            <View style={styles.optionsContainer}>
-                {curOptions.map((op, idx) => (
-                    <Pressable 
-                        key={idx} 
-                        style={[
-                            styles.optionButton, 
-                            (selected === op && correct) && styles.correctButton,
-                            (selected === op && !correct) && styles.incorrectButton,
-                            { opacity: (selected === op) ? 0.5 : 1 }
-                        ]}
-                        onPress={() => handleOptionPress(op)}
-                    >
-                        <Text style={styles.optionText}>{op}</Text>
-                    </Pressable>
-                ))}
-            </View>
 
             <Pressable style={({ pressed }) => [
                 styles.nextButton,
