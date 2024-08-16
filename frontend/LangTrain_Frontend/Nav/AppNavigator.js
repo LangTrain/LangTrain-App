@@ -9,6 +9,7 @@ import ForgotPassword from "../Pages/Auth/ForgotPassword.tsx";
 import QuizLevel from "../Pages/Quiz/QuizLevel";
 import Quiz from "../Pages/Quiz/Quiz";
 import Result from "../Pages/Quiz/Result";
+import ScoreReport from "../Pages/Quiz/ScoreReport";
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -55,6 +56,12 @@ const AppNavigator = () => {
           component={Result}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="ScoreReport"
+          component={ScoreReport}
+          options={{ headerShown: false }}
+        />
+        
       </Stack.Navigator>
     </NavigationContainer>
   );

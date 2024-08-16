@@ -8,20 +8,31 @@ export default function QuizLevel({ navigation }) {
   };
 
   return (
-    <View className="flex-1 justify-center items-center bg-gray-100 p-5">
-      <Text className="text-2xl font-bold text-gray-800 mb-5">Choose the Difficulty</Text>
-
-      <Pressable className="bg-blue-500 py-4 px-8 rounded-md my-2 w-4/5 items-center" onPress={() => handlePress('Easy')}>
-        <Text className="text-white text-lg font-bold">Easy</Text>
+    <View className="flex-1 bg-gray-100 p-5">
+      <Pressable 
+        className="absolute top-16 left-5 bg-gray-300 py-2 px-4 rounded-md z-10" 
+        onPress={() => {
+            navigation.navigate('Login');
+        }}
+      >
+        <Text className="text-gray-800 font-bold">Home</Text>
       </Pressable>
 
-      <Pressable className="bg-blue-500 py-4 px-8 rounded-md my-2 w-4/5 items-center" onPress={() => handlePress('Medium')}>
-        <Text className="text-white text-lg font-bold">Medium</Text>
-      </Pressable>
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-2xl font-bold text-gray-800 mb-5">Choose the Difficulty</Text>
 
-      <Pressable className="bg-blue-500 py-4 px-8 rounded-md my-2 w-4/5 items-center" onPress={() => handlePress('Hard')}>
-        <Text className="text-white text-lg font-bold">Hard</Text>
-      </Pressable>
+        <Pressable className="bg-blue-500 py-4 px-8 rounded-md my-2 w-4/5 items-center" onPress={() => handlePress('Easy')}>
+          <Text className="text-white text-lg font-bold">Easy</Text>
+        </Pressable>
+
+        <Pressable className="bg-blue-500 py-4 px-8 rounded-md my-2 w-4/5 items-center" onPress={() => handlePress('Medium')}>
+          <Text className="text-white text-lg font-bold">Medium</Text>
+        </Pressable>
+
+        <Pressable className="bg-blue-500 py-4 px-8 rounded-md my-2 w-4/5 items-center" onPress={() => handlePress('Hard')}>
+          <Text className="text-white text-lg font-bold">Hard</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
