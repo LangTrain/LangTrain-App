@@ -1,26 +1,8 @@
-import { StyleSheet, Text, View, Pressable } from 'react-native';
+import { Text, View, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
-// import questionBank from '../../questionBank';
 import { useRoute } from '@react-navigation/native';
 import { db } from '../../firebase';
-import { collection, getDocs, addDoc, doc, setDoc, deleteDoc } from 'firebase/firestore';
-/**
- * You can access this actuaL Quiz page by pressing 
- * the "Quiz time" button in login page.
- * 
- * All the pages are added to stack screens.
- * On the result screen, you can go back to Login,
- * since there's no button to move in chat bot screen
- * 
- * I store the questionBank.js under root directory which store all the questions
- * Later I would need to connect with firebase for real questions and a lot more 
- * faeture impovement 
- * 
- * 1) every time you open the quiz, it should be different sets of questions
- * 2) after the quiz in the result screen, add button to view all mistakes VS answers
- * 3) change all styles to nativeWind
- */
-
+import { collection, getDocs } from 'firebase/firestore';
 
 export default function Quiz({ navigation }) {
     const route = useRoute();
@@ -38,21 +20,20 @@ export default function Quiz({ navigation }) {
     const [questionBank, setQuestionBank] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    // fetch proper difficulty as needed
     const fetchQuestion = async () => {
         try {
             setLoading(true);
             const quizQuestionCollectionRef = collection(db, 'quizBank', difficulty, 'quizQuestion');
             const querySnapshot = await getDocs(quizQuestionCollectionRef);
-            const questions = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
+            let questions = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
             }));
 
-            // console.log(questions)
-            setQuestionBank(questions)
+            questions = shuffleArray(questions);
+            // console.log(questions);
+            setQuestionBank(questions);
 
-            // load in the first question on the screen
             let ques = questions[0].question;
             setCurQues(ques);
             let options = questions[0].options;
@@ -65,11 +46,10 @@ export default function Quiz({ navigation }) {
         } finally {
             setLoading(false);
         }
-        
-    }
+    };
 
     useEffect(() => {
-        if(questionBank){
+        if (questionBank) {
             let ques = questionBank[index].question;
             setCurQues(ques);
             let options = questionBank[index].options;
@@ -77,15 +57,21 @@ export default function Quiz({ navigation }) {
             let ans = questionBank[index].correctAnswer;
             setCurAns(ans);
         }
-        
     }, [index]);
 
     useEffect(() => {
         fetchQuestion();
-    }, [])
+    }, []);
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
 
     const handleOptionPress = (option) => {
-        // console.log(`Selected option: ${option}`);
         setSelected(option);
         setCorrect(option === curAns);
         if (firstSel) {
@@ -116,109 +102,35 @@ export default function Quiz({ navigation }) {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>{difficulty} Mode</Text>
-            {
-                loading ? (<View><Text>loading</Text></View>) :(
-                    <>
-                        <Text style={styles.question}>{curQues}</Text>
-            
-                        <View style={styles.optionsContainer}>
-                            {curOptions.map((op, idx) => (
-                                <Pressable 
-                                    key={idx} 
-                                    style={[
-                                        styles.optionButton, 
-                                        (selected === op && correct) && styles.correctButton,
-                                        (selected === op && !correct) && styles.incorrectButton,
-                                        { opacity: (selected === op) ? 0.5 : 1 }
-                                    ]}
-                                    onPress={() => handleOptionPress(op)}
-                                >
-                                    <Text style={styles.optionText}>{op}</Text>
-                                </Pressable>
-                            ))}
-                        </View>
-                    </>
-                )
-            }
-            
+        <View className="flex-1 justify-center items-center bg-gray-100 p-5">
+            <Text className="text-2xl font-bold text-gray-800 mb-5">{difficulty} Mode</Text>
+            {loading ? (
+                <View><Text>Loading...</Text></View>
+            ) : (
+                <>
+                    <Text className="text-xl text-gray-700 mb-5 text-center">{curQues}</Text>
 
-            <Pressable style={({ pressed }) => [
-                styles.nextButton,
-                pressed && styles.nextButtonPressed
-            ]} onPress={handleNext}>
-                <Text style={styles.nextButtonText}>
-                    Next
-                </Text>
+                    <View className="w-full items-center">
+                        {curOptions.map((op, idx) => (
+                            <Pressable 
+                                key={idx} 
+                                className={`bg-blue-500 py-3 px-6 rounded-lg my-2 w-4/5 items-center ${selected === op && correct ? 'bg-green-500' : ''} ${selected === op && !correct ? 'bg-red-500' : ''}`}
+                                onPress={() => handleOptionPress(op)}
+                                style={{ opacity: selected === op ? 0.5 : 1 }}
+                            >
+                                <Text className="text-white text-lg font-bold">{op}</Text>
+                            </Pressable>
+                        ))}
+                    </View>
+                </>
+            )}
+
+            <Pressable 
+                className="bg-gray-500 py-3 px-6 rounded-lg mt-5 w-3/5 items-center justify-center"
+                onPress={handleNext}
+            >
+                <Text className="text-white text-lg font-bold">Next</Text>
             </Pressable>
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f0f0f0',
-        padding: 20,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 20,
-    },
-    question: {
-        fontSize: 22,
-        color: '#444',
-        marginBottom: 20,
-        textAlign: 'center',
-    },
-    optionsContainer: {
-        width: '100%',
-        alignItems: 'center',
-    },
-    optionButton: {
-        backgroundColor: '#007BFF',
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        borderRadius: 8,
-        marginVertical: 8,
-        width: '80%',
-        alignItems: 'center',
-    },
-    optionButtonPressed: {
-        backgroundColor: '#0056b3',
-    },
-    optionText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    correctButton: {
-        backgroundColor: 'green',
-    },
-    incorrectButton: {
-        backgroundColor: 'red',
-    },
-    nextButton: {
-        backgroundColor: 'gray',
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        borderRadius: 8,
-        marginTop: 20,
-        width: '60%',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    nextButtonPressed: {
-        backgroundColor: '#218838',
-    },
-    nextButtonText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-});

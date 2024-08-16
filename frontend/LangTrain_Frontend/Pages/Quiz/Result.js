@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 
 export default function Result({ navigation }) {
@@ -6,52 +6,16 @@ export default function Result({ navigation }) {
     const { score, totalQuestions } = route.params;
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Quiz Results</Text>
-            <Text style={styles.resultText}>
+        <View className="flex-1 justify-center items-center bg-gray-100 p-5">
+            <Text className="text-4xl font-bold text-gray-800 mb-5">Quiz Results</Text>
+            <Text className="text-2xl text-gray-600 mb-5">
                 You scored {score} out of {totalQuestions}!
             </Text>
 
             {/* back to log in for now*/}
-            <Pressable style={styles.button} onPress={() => navigation.navigate('Login')}>
-                <Text style={styles.buttonText}>Back to Home</Text>
+            <Pressable className="bg-blue-500 py-3 px-6 rounded-md mt-5 w-3/5 items-center justify-center" onPress={() => navigation.navigate('Login')}>
+                <Text className="text-white text-lg font-bold">Back to Home</Text>
             </Pressable>
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f0f0f0',
-        padding: 20,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 20,
-    },
-    resultText: {
-        fontSize: 22,
-        color: '#444',
-        marginBottom: 20,
-    },
-    button: {
-        backgroundColor: '#007BFF',
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        borderRadius: 8,
-        marginTop: 20,
-        width: '60%',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-});

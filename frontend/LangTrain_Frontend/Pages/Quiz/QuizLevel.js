@@ -1,5 +1,4 @@
-import { StyleSheet, Text, View, Pressable } from 'react-native';
-import { db } from '../../firebase';
+import { Text, View, Pressable } from 'react-native';
 
 export default function QuizLevel({ navigation }) {
 
@@ -9,50 +8,20 @@ export default function QuizLevel({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Choose the Difficulty</Text>
+    <View className="flex-1 justify-center items-center bg-gray-100 p-5">
+      <Text className="text-2xl font-bold text-gray-800 mb-5">Choose the Difficulty</Text>
 
-      <Pressable style={styles.button} onPress={() => handlePress('Easy')}>
-        <Text style={styles.buttonText}>Easy</Text>
+      <Pressable className="bg-blue-500 py-4 px-8 rounded-md my-2 w-4/5 items-center" onPress={() => handlePress('Easy')}>
+        <Text className="text-white text-lg font-bold">Easy</Text>
       </Pressable>
 
-      <Pressable style={styles.button} onPress={() => handlePress('Medium')}>
-        <Text style={styles.buttonText}>Medium</Text>
+      <Pressable className="bg-blue-500 py-4 px-8 rounded-md my-2 w-4/5 items-center" onPress={() => handlePress('Medium')}>
+        <Text className="text-white text-lg font-bold">Medium</Text>
       </Pressable>
 
-      <Pressable style={styles.button} onPress={() => handlePress('Hard')}>
-        <Text style={styles.buttonText}>Hard</Text>
+      <Pressable className="bg-blue-500 py-4 px-8 rounded-md my-2 w-4/5 items-center" onPress={() => handlePress('Hard')}>
+        <Text className="text-white text-lg font-bold">Hard</Text>
       </Pressable>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333', 
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: '#007BFF', 
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 5,
-    marginVertical: 10,
-    width: '80%', 
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff', 
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
