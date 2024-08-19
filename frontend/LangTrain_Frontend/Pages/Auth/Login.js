@@ -92,13 +92,6 @@ const LoginScreen = ({ navigation }) => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="bg-blue-500 rounded-xl h-12 justify-center items-center w-full max-w-xs mt-4" onPress={() => navigation.navigate("QuizLevel")}>
-            <Text className='text-white text-lg font-bold'>
-              Quiz Time
-            </Text>
-          </TouchableOpacity>
-
-
         </View>
       </ScrollView>
     </SafeAreaView>
