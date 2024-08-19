@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Pressable, SafeAreaView } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from '../../../firebase';
 
 const ScoreReport = ({ navigation }) => {
     const route = useRoute();

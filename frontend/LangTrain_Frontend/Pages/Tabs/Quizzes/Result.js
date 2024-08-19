@@ -13,8 +13,8 @@ export default function Result({ navigation }) {
             </Text>
 
             {/* back to log in for now*/}
-            <Pressable className="bg-blue-500 py-3 px-6 rounded-md mt-5 w-3/5 items-center justify-center" onPress={() => navigation.navigate('Login')}>
-                <Text className="text-white text-lg font-bold">Back to Home</Text>
+            <Pressable className="bg-blue-500 py-3 px-6 rounded-md mt-5 w-3/5 items-center justify-center" onPress={() => navigation.navigate('QuizLevel')}>
+                <Text className="text-white text-lg font-bold">Back to Levels</Text>
             </Pressable>
 
             <Pressable className="bg-blue-500 py-3 px-6 rounded-md mt-5 w-3/5 items-center justify-center" 

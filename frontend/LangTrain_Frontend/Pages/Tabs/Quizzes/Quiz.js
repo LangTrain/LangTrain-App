@@ -1,7 +1,7 @@
 import { Text, View, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useRoute } from '@react-navigation/native';
-import { db } from '../../firebase';
+import { db } from '../../../firebase';
 import { collection, getDocs, addDoc } from 'firebase/firestore';
 
 export default function Quiz({ navigation }) {

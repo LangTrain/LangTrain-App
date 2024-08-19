@@ -28,9 +28,8 @@ const Chatbot = () => {
 
   const levels = ["Beginner", "Intermediate", "Advanced", "Professional"]; // Level options
 
-  useEffect(() => {
-    // Fetch available voices and filter them
-    const fetchVoices = async () => {
+  const fetchVoices = async () => {
+    try {
       const voices = await Speech.getAvailableVoicesAsync();
       console.log("Available voices:", voices);
 
@@ -42,12 +41,20 @@ const Chatbot = () => {
       }, []);
 
       setAvailableLanguages(filteredLanguages);
-    };
+    } catch (error) {
+      console.error("Error fetching voices:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchVoices();
   }, []);
 
-  const speakText = (text) => {
+  const refreshLanguages = () => {
+    fetchVoices();
+  };
+
+  const speakText = (text, language) => {
     const options = {
       pitch: 1,
       rate: speechRate,
@@ -77,17 +84,37 @@ const Chatbot = () => {
       const aiResponse = await fetchOpenAiResponse(
         messageContent,
         language,
-        level // Pass level to API call
+        level
       );
+
+      // Assuming the response format is:
+      // [Selected Language Response]
+      // [English Translation]
+      const [selectedLanguageResponse, englishResponse] =
+        aiResponse.split("===");
+
+      const cleanedSelectedLanguageResponse = selectedLanguageResponse.replace(
+        /\n/g,
+        " "
+      );
+      const cleanedEnglishResponse = englishResponse.replace(/\n/g, " ");
 
       setMessages((oldMessages) =>
         oldMessages.map((msg) =>
-          msg.id === aiMessage.id ? { ...msg, content: aiResponse } : msg
+          msg.id === aiMessage.id
+            ? {
+                ...msg,
+                content:
+                  cleanedSelectedLanguageResponse +
+                  "\n" +
+                  cleanedEnglishResponse,
+              }
+            : msg
         )
       );
 
       if (isVoiceOn) {
-        speakText(aiResponse);
+        speakText(cleanedSelectedLanguageResponse, language); // Speak in the selected language
       }
     } catch (error) {
       console.log(error);
@@ -119,8 +146,8 @@ const Chatbot = () => {
                   <Image
                     source={
                       message.role === "assistant"
-                        ? require("../../assets/lt-owl.png")
-                        : require("../../assets/user.png")
+                        ? require("../../../assets/lt-owl.png")
+                        : require("../../../assets/user.png")
                     }
                     className="w-8 h-8 rounded-full"
                   />
@@ -207,11 +234,16 @@ const Chatbot = () => {
                 </TouchableOpacity>
               ))}
             </ScrollView>
-            <Text className="text-xs text-center text-[#353535]">
+            <Button
+              title="Refresh"
+              onPress={refreshLanguages}
+              color="#5bc0de"
+            />
+            <Text className="text-xs text-center text-[#353535] mt-2">
               Don't see the language you're looking for? Go to Phone settings >
               Languages > Find option to download language packs > Download pack
               for the language you'd like to learn (may vary per phone but
-              routine is similar)
+              routine is similar), then click Refresh :)
             </Text>
             <Button
               title="Close"

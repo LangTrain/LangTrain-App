@@ -1,5 +1,5 @@
 // openAiApi.js
-import { OPENAI_API_KEY } from "../../env";
+import { OPENAI_API_KEY } from "../../../env";
 import axios from "axios";
 
 export const fetchOpenAiResponse = async (userMessage, language, level) => {
@@ -13,11 +13,12 @@ export const fetchOpenAiResponse = async (userMessage, language, level) => {
         messages: [
           {
             role: "system",
-            content: `You are a professional language teacher teaching ${language} to a student at a ${level} level. Always reply in the ${language} even if student speaks to you in another language.`,
+            content: `You are a professional language teacher teaching ${language} to a student at a ${level} level. Please provide the response to the user message in ${language}. Then provide a detailed explanation in English with help with pronounciation. The two responses should always be split into two sections with === in the middle.`,
           },
           { role: "user", content: userMessage },
         ],
-        temperature: 0.7,
+        temperature: 0.6,
+        max_tokens: 500,
       },
       {
         headers: {

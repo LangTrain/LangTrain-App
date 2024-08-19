@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import Chatbot from "./Chatbot/Chatbot";
+import Chatbot from "./Tabs/Chatbot/index";
 
 const HomeScreen = () => {
   return (
