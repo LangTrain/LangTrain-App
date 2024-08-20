@@ -7,6 +7,7 @@ import Profile from "../Pages/Tabs/Profile";
 import Quizzes from "../Pages/Tabs/Quizzes";
 import Lessons from "../Pages/Tabs/Lessons";
 import CommunityStackNavigator from "./CommunityStackNavigator";
+import QuizStackNavigator from "./QuizStackNavigator";
 
 const Tab = createBottomTabNavigator();
 const tabScreens = [
@@ -27,7 +28,7 @@ const tabScreens = [
   },
   {
     name: "Quizzes",
-    component: Quizzes,
+    component: QuizStackNavigator,
     label: "Quizzes",
     icon: "all-inclusive-box",
     show: true,
