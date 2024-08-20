@@ -33,9 +33,24 @@ const Chat = ({ route }) => {
     if (messageText.trim() === "") return;
 
     try {
-      const photoURL = auth.currentUser.photoURL
-        ? auth.currentUser.photoURL
-        : await getDownloadURL(ref(storage, "user.png"));
+      let photoURL = auth.currentUser.photoURL;
+
+      if (!photoURL) {
+        try {
+          // Attempt to fetch the default user.png from Firebase Storage
+          const storageRef = ref(storage, "user.png");
+          photoURL = await getDownloadURL(storageRef);
+        } catch (error) {
+          // If fetching user.png fails, fall back to a local asset or another known URL
+          console.error(
+            "Failed to fetch default image from Firebase Storage: ",
+            error
+          );
+          photoURL = Image.resolveAssetSource(
+            require("../../../assets/user.png")
+          ).uri;
+        }
+      }
 
       await addDoc(collection(db, "channels", channelId, "messages"), {
         text: messageText,

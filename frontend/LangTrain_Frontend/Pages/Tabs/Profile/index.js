@@ -30,10 +30,12 @@ const Profile = () => {
   const [isEditingDisplayName, setIsEditingDisplayName] = useState(false);
 
   // State to store input values
-  const [displayName, setDisplayName] = useState(
-    auth.currentUser.displayName || "Unknown User"
-  );
-  const [profileImage, setProfileImage] = useState("");
+  const [displayName, setDisplayName] = useState(() => {
+    return auth.currentUser
+      ? auth.currentUser.displayName || "Unknown User"
+      : "Unknown User";
+  });
+  const [profileImage, setProfileImage] = useState("example_url");
 
   const accountName = auth.currentUser.email;
   const emailVerified = auth.currentUser.emailVerified;
