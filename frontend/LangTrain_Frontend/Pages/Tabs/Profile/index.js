@@ -37,8 +37,8 @@ const Profile = () => {
   });
   const [profileImage, setProfileImage] = useState("example_url");
 
-  const accountName = auth.currentUser.email;
-  const emailVerified = auth.currentUser.emailVerified;
+  const [accountName, setAccountName] = useState("Loading...");
+  const [emailVerified, setEmailVerified] = useState(false);
 
   useEffect(() => {
     const fetchProfileImage = async () => {
@@ -59,6 +59,13 @@ const Profile = () => {
 
     fetchProfileImage();
   }, []);
+
+  useEffect(() => {
+    if (auth.currentUser) {
+      setAccountName(auth.currentUser.email || "Unknown Email");
+      setEmailVerified(auth.currentUser.emailVerified || false);
+    }
+  }, [auth.currentUser]);
 
   const handleSignOut = async () => {
     try {
@@ -215,7 +222,8 @@ const Profile = () => {
               <Text className="ml-8 my-auto">Verified Email</Text>
               <View className="flex flex-row items-center justify-end my-auto">
                 <Text className="right-4">
-                  {`${emailVerified}`.toUpperCase()}
+                  {console.log(emailVerified)}
+                  {`${emailVerified}` === "false" ? "FALSE" : "TRUE"}
                 </Text>
               </View>
             </View>
