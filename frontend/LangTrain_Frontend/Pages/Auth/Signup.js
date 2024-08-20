@@ -34,14 +34,15 @@ const SignupScreen = ({ navigation }) => {
     }
 
     try {
-      await signUp(form.email, form.password);
-      Alert.alert("User registered successfully!");
-      navigation.navigate("EmailVerification");
+      await signUp(form.email, form.password, navigation);
+      Alert.alert(
+        "Success",
+        "User registered successfully! Please check your email to verify your account."
+      );
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error", error.message);
     }
   };
-
   return (
     <SafeAreaView className="bg-white h-full">
       <ScrollView>
