@@ -94,7 +94,7 @@ const Profile = () => {
       console.log("Image Picker Result:", result);
 
       if (result.canceled || !result.assets || result.assets.length === 0) {
-        console.error(
+        console.log(
           "Image picking was cancelled or did not return a valid URI."
         );
         return;
