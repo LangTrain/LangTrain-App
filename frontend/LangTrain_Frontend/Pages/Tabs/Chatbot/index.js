@@ -13,6 +13,8 @@ import {
 import Slider from "@react-native-community/slider";
 import * as Speech from "expo-speech";
 import { fetchOpenAiResponse } from "./openAiApi"; // Import the API call function
+import { auth, storage } from "../../../firebase";
+import { ref, getDownloadURL } from "firebase/storage";
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([]);
@@ -25,8 +27,29 @@ const Chatbot = () => {
   const [level, setLevel] = useState("Beginner"); // Add level state
   const [levelModalVisible, setLevelModalVisible] = useState(false); // Modal visibility for level
   const [availableLanguages, setAvailableLanguages] = useState([]); // State to store available languages
+  const [userImage, setUserImage] = useState(null); // State for user profile image
 
   const levels = ["Beginner", "Intermediate", "Advanced", "Professional"]; // Level options
+
+  useEffect(() => {
+    const fetchUserProfileImage = async () => {
+      try {
+        let imageUrl = auth.currentUser.photoURL;
+
+        if (!imageUrl) {
+          // If user's photoURL doesn't exist, use the default image in Firebase Storage
+          const storageRef = ref(storage, "user.png");
+          imageUrl = await getDownloadURL(storageRef);
+        }
+
+        setUserImage(imageUrl);
+      } catch (error) {
+        console.error("Failed to fetch profile image:", error);
+      }
+    };
+
+    fetchUserProfileImage();
+  }, []);
 
   const fetchVoices = async () => {
     try {
@@ -87,9 +110,6 @@ const Chatbot = () => {
         level
       );
 
-      // Assuming the response format is:
-      // [Selected Language Response]
-      // [English Translation]
       const [selectedLanguageResponse, englishResponse] =
         aiResponse.split("===");
 
@@ -147,7 +167,10 @@ const Chatbot = () => {
                     source={
                       message.role === "assistant"
                         ? require("../../../assets/lt-owl.png")
-                        : require("../../../assets/user.png")
+                        : {
+                            uri:
+                              userImage || require("../../../assets/user.png"),
+                          }
                     }
                     className="w-8 h-8 rounded-full"
                   />
