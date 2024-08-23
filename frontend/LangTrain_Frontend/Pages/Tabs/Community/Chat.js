@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, Button, FlatList } from "react-native";
-import { db, auth } from "../../../firebase";
+import { View, Text, TextInput, Button, FlatList, Image } from "react-native";
+import { db, auth, storage } from "../../../firebase";
 import {
   collection,
   addDoc,
@@ -8,6 +8,7 @@ import {
   onSnapshot,
   orderBy,
 } from "firebase/firestore";
+import { getDownloadURL, ref } from "firebase/storage";
 
 const Chat = ({ route }) => {
   const { channelId } = route.params;
@@ -32,9 +33,29 @@ const Chat = ({ route }) => {
     if (messageText.trim() === "") return;
 
     try {
+      let photoURL = auth.currentUser.photoURL;
+
+      if (!photoURL) {
+        try {
+          // Attempt to fetch the default user.png from Firebase Storage
+          const storageRef = ref(storage, "user.png");
+          photoURL = await getDownloadURL(storageRef);
+        } catch (error) {
+          // If fetching user.png fails, fall back to a local asset or another known URL
+          console.error(
+            "Failed to fetch default image from Firebase Storage: ",
+            error
+          );
+          photoURL = Image.resolveAssetSource(
+            require("../../../assets/user.png")
+          ).uri;
+        }
+      }
+
       await addDoc(collection(db, "channels", channelId, "messages"), {
         text: messageText,
-        sender: auth.currentUser.email,
+        sender: auth.currentUser.displayName || auth.currentUser.email,
+        photoURL: photoURL,
         timestamp: new Date(),
       });
       setMessageText("");
@@ -50,12 +71,17 @@ const Chat = ({ route }) => {
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View
-            className={`mb-2 p-4 rounded-lg ${
+            className={`mb-2 p-4 rounded-lg flex-row items-center ${
+              item.sender === auth.currentUser.displayName ||
               item.sender === auth.currentUser.email
                 ? "bg-[#e0f0ff] self-end"
                 : "bg-white self-start"
             }`}
           >
+            <Image
+              source={{ uri: item.photoURL }}
+              className="w-8 h-8 rounded-full mr-3"
+            />
             <Text className="text-[#353535]">
               {item.sender}: {item.text}
             </Text>

@@ -105,7 +105,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
     }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, navigation: any) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -124,6 +124,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
           first_name: "",
           last_name: "",
         });
+        navigation.navigate("EmailVerification");
       }
     } catch (error) {
       console.log(error);
