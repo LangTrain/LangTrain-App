@@ -3,7 +3,7 @@ import { useRoute } from '@react-navigation/native';
 
 export default function Result({ navigation }) {
     const route = useRoute();
-    const { score, totalQuestions, attemptID } = route.params;
+    const { score, totalQuestions, attemptID, topic, difficulty } = route.params;
     
     return (
         <View className="flex-1 justify-center items-center bg-gray-100 p-5">
@@ -20,7 +20,9 @@ export default function Result({ navigation }) {
             <Pressable className="bg-blue-500 py-3 px-6 rounded-md mt-5 w-3/5 items-center justify-center" 
                 onPress={() => navigation.navigate('ScoreReport', { 
                     score, 
-                    attemptID
+                    attemptID,
+                    topic,
+                    difficulty
              })}>
                 <Text className="text-white text-lg font-bold">View Score Report</Text>
             </Pressable>

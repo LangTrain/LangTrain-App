@@ -6,7 +6,7 @@ import { collection, getDocs, addDoc } from 'firebase/firestore';
 
 export default function Quiz({ navigation }) {
     const route = useRoute();
-    const { difficulty } = route.params;
+    const { difficulty, topic } = route.params;
 
     const [index, setIndex] = useState(0);
     const [curQues, setCurQues] = useState('');
@@ -24,14 +24,31 @@ export default function Quiz({ navigation }) {
     const [submitting, setSubmitting] = useState(false);
 
     const fetchQuestion = async () => {
+
+        let questions = []
+
         try {
             setLoading(true);
-            const quizQuestionCollectionRef = collection(db, 'quizBank', difficulty, 'quizQuestion');
-            const querySnapshot = await getDocs(quizQuestionCollectionRef);
-            let questions = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data(),
-            }));
+            
+            if (topic == "navigate only difficulty") {
+                // console.log("navigate only difficulty:", difficulty)
+                const quizQuestionCollectionRef = collection(db, 'quizBank', difficulty, 'quizQuestion');
+                const querySnapshot = await getDocs(quizQuestionCollectionRef);
+                questions = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+            }
+            else {
+                // console.log("we have a topic:", topic)
+                
+                const quizQuestionCollectionRef = collection(db, 'quizBank', 'CreatedQuiz', topic);
+                const querySnapshot = await getDocs(quizQuestionCollectionRef);
+                questions = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+            }
 
             questions = shuffleArray(questions);
             // console.log(questions);
@@ -112,7 +129,9 @@ export default function Quiz({ navigation }) {
             navigation.navigate('Result', {
                 score,
                 totalQuestions: questionBank.length,
-                attemptID: docId
+                attemptID: docId,
+                topic,
+                difficulty
             });
     
             setIndex(0);
