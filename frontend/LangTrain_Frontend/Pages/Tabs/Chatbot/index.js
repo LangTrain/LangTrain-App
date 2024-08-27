@@ -99,7 +99,7 @@ const Chatbot = () => {
     const aiMessage = {
       id: generateUniqueId(),
       role: "assistant",
-      content: "Robin is thinking...",
+      content: "LangTrain is thinking...",
     };
 
     setMessages((oldMessages) => [...oldMessages, userMessage, aiMessage]);
