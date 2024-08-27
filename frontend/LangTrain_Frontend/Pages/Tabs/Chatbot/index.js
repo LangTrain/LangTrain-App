@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -15,8 +15,10 @@ import * as Speech from "expo-speech";
 import { fetchOpenAiResponse } from "./openAiApi"; // Import the API call function
 import { auth, storage } from "../../../firebase";
 import { ref, getDownloadURL } from "firebase/storage";
+import ScrollToBottomButton from "../Shared/ScrollToBottomButton";
 
 const Chatbot = () => {
+  const scrollViewRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [isVoiceOn, setIsVoiceOn] = useState(false);
@@ -154,7 +156,7 @@ const Chatbot = () => {
     <View className="flex-1 bg-[#f0f4f7]">
       <View className="flex-1 p-4">
         <View className="flex-1 bg-white rounded-lg shadow-md overflow-hidden">
-          <ScrollView className="flex-1">
+          <ScrollView ref={scrollViewRef} className="flex-1">
             {messages.map((message) => (
               <View
                 key={message.id}
@@ -181,6 +183,11 @@ const Chatbot = () => {
               </View>
             ))}
           </ScrollView>
+          <ScrollToBottomButton
+            scrollViewRef={scrollViewRef}
+            messages={messages}
+            name={"chatbot"}
+          />
         </View>
         <View className="mt-4 bg-[#e0f0ff] p-3 rounded-lg">
           <View className="flex-row items-center space-x-2 mb-2">

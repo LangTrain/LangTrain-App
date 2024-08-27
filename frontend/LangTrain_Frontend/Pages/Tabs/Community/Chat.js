@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, Text, TextInput, Button, FlatList, Image } from "react-native";
 import { db, auth, storage } from "../../../firebase";
 import {
@@ -9,8 +9,10 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { getDownloadURL, ref } from "firebase/storage";
+import ScrollToBottomButton from "../Shared/ScrollToBottomButton";
 
 const Chat = ({ route }) => {
+  const flatListRef = useRef(null);
   const { channelId } = route.params;
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
@@ -67,6 +69,7 @@ const Chat = ({ route }) => {
   return (
     <View className="flex-1 p-4 bg-[#f0f4f7]">
       <FlatList
+        ref={flatListRef}
         data={messages}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
@@ -87,6 +90,11 @@ const Chat = ({ route }) => {
             </Text>
           </View>
         )}
+      />
+      <ScrollToBottomButton
+        scrollViewRef={flatListRef}
+        messages={messages}
+        name={"community"}
       />
       <View className="flex-row items-center border-t border-[#ccc] p-2 bg-white">
         <TextInput
