@@ -1,11 +1,20 @@
 import { Text, View, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useRoute } from '@react-navigation/native';
-import { db } from '../../../firebase';
-import { collection, getDocs, addDoc } from 'firebase/firestore';
+import { db, auth } from '../../../firebase';
+import { collection, getDocs, addDoc, updateDoc, arrayUnion, query, where, doc } from 'firebase/firestore';
 
 export default function Quiz({ navigation }) {
     const route = useRoute();
+
+    const [displayName, setDisplayName] = useState(() => {
+        // console.log("current user:")
+        // console.log(auth.currentUser.email)
+        return auth.currentUser
+          ? auth.currentUser.displayName || "Unknown User"
+          : "Unknown User";
+      });
+
     const { difficulty, topic } = route.params;
 
     const [index, setIndex] = useState(0);
@@ -22,6 +31,10 @@ export default function Quiz({ navigation }) {
 
     const [attemptHistory, setAttempHistory] = useState([]);
     const [submitting, setSubmitting] = useState(false);
+
+    const [userMistakes, setUserMistakes] = useState([]);
+
+    
 
     const fetchQuestion = async () => {
 
@@ -97,6 +110,18 @@ export default function Quiz({ navigation }) {
         // if we are making our first choice, we update our score and 
         // add to our attempt history
         if (firstSel) {
+            // if user made a mistake, we want to add to error state
+            if (option !== curAns) {
+                setUserMistakes([
+                    ...userMistakes,
+                    {
+                        question: curQues,
+                        correctAnswer: curAns,
+                        selectedAnswer: option,
+                    },
+                ]);
+            }
+
             if (option === curAns) {
                 setScore(score + 1);
             }
@@ -142,21 +167,64 @@ export default function Quiz({ navigation }) {
         }
     };
     
-    const uploadAttemptHistory = async () => {
-        setSubmitting(true);
-        try {
-            const docRef = await addDoc(collection(db, 'attemptHistory'), {
-                attempts: attemptHistory,
+
+const uploadAttemptHistory = async () => {
+    setSubmitting(true);
+    try {
+        // Always upload the attempt history
+        const docRef = await addDoc(collection(db, 'attemptHistory'), {
+            attempts: attemptHistory,
+            timestamp: new Date(),
+        });
+
+        const userEmail = auth.currentUser?.email;
+        
+        // Query to find if the user already has a document in 'userMistakes'
+        const mistakesQuery = query(
+            collection(db, 'userMistakes'),
+            where('userEmail', '==', userEmail)
+        );
+        const querySnapshot = await getDocs(mistakesQuery);
+
+        if (!querySnapshot.empty) {
+            // If the document exists, update it with the new mistakes
+            const docId = querySnapshot.docs[0].id;
+            const docRef = doc(db, 'userMistakes', docId);
+
+            // Check for duplicate mistakes before adding
+            const existingMistakes = querySnapshot.docs[0].data().mistakes;
+
+            const newMistakes = userMistakes.filter(mistake => 
+                !existingMistakes.some(existingMistake =>
+                    existingMistake.question === mistake.question &&
+                    existingMistake.correctAnswer === mistake.correctAnswer &&
+                    existingMistake.selectedAnswer === mistake.selectedAnswer
+                )
+            );
+
+            if (newMistakes.length > 0) {
+                await updateDoc(docRef, {
+                    mistakes: arrayUnion(...newMistakes),
+                    timestamp: new Date(),
+                });
+            }
+        } else {
+            // If no document exists, create a new one
+            await addDoc(collection(db, 'userMistakes'), {
+                userEmail,
+                mistakes: userMistakes,
                 timestamp: new Date(),
             });
-            return docRef.id;
-        } catch (e) {
-            console.error("Error adding document: ", e);
-        } finally {
-            setSubmitting(false);
         }
-    };
-    
+
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding document: ", e);
+    } finally {
+        setSubmitting(false);
+    }
+};
+
 
     return (
         <View className="flex-1 justify-center items-center bg-gray-100 p-5">
@@ -172,7 +240,7 @@ export default function Quiz({ navigation }) {
             ) : (
                 <>
                     <Text className="text-2xl font-bold text-gray-800 mb-5">{difficulty} Mode</Text>
-
+                    
                     <Text className="text-xl text-gray-700 mb-5 text-center">{curQues}</Text>
 
                     <View className="w-full items-center">
@@ -194,6 +262,26 @@ export default function Quiz({ navigation }) {
                     >
                         <Text className="text-white text-lg font-bold">Next</Text>
                     </Pressable>
+
+                    {/* Progress Bar */}
+                    {
+                        questionBank && (
+                            <View className="w-full h-4 bg-gray-300 rounded-full mt-5 relative">
+                                <View 
+                                    className="h-full bg-green-500 rounded-full"
+                                    style={{ width: `${((index) / (questionBank.length + 1)) * 100}%` }}
+                                />
+                                
+                                <View className="absolute w-full flex-row justify-between mt-7">
+                                    <Text className="text-black-500 text-base">{`${Math.round(((index) / (questionBank.length + 1)) * 100)}%`}</Text>
+                                    <Text className="text-black-500 text-base">{`${index + 1}/${questionBank.length}`}</Text>
+                                </View>
+                            </View>
+                        )
+                    }
+
+                    
+                    
                 </>
             )}
         </View>

@@ -37,6 +37,11 @@ export default function QuizLevel({ navigation }) {
           <Text className="text-white text-lg font-bold">🤯 Hard</Text>
         </Pressable>
 
+        <Text className="text-2xl font-bold text-gray-800 mb-5 mt-5">📕 Review </Text>
+
+        <Pressable className="bg-red-800 py-4 px-8 rounded-md my-2 w-4/5 items-center" onPress={() => navigation.navigate("MyMistakes")}>
+          <Text className="text-white text-lg font-bold">😫 My Mistakes</Text>
+        </Pressable>
         
       </View>
     </View>
