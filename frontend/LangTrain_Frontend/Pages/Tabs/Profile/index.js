@@ -32,7 +32,8 @@ const Profile = () => {
   // State to store input values
   const [displayName, setDisplayName] = useState(() => {
     return auth.currentUser
-      ? auth.currentUser.displayName || "Unknown User"
+      ? auth.currentUser.displayName ||
+          auth.currentUser.email.match(/^([^@]+)/)[1]
       : "Unknown User";
   });
   const [profileImage, setProfileImage] = useState("example_url");

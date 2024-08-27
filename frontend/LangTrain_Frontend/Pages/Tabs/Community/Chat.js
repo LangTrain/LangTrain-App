@@ -56,7 +56,9 @@ const Chat = ({ route }) => {
 
       await addDoc(collection(db, "channels", channelId, "messages"), {
         text: messageText,
-        sender: auth.currentUser.displayName || auth.currentUser.email,
+        sender:
+          auth.currentUser.displayName ||
+          auth.currentUser.email.match(/^([^@]+)/)[1],
         photoURL: photoURL,
         timestamp: new Date(),
       });
@@ -76,7 +78,7 @@ const Chat = ({ route }) => {
           <View
             className={`mb-2 p-4 rounded-lg flex-row items-center ${
               item.sender === auth.currentUser.displayName ||
-              item.sender === auth.currentUser.email
+              item.sender === auth.currentUser.email.match(/^([^@]+)/)[1]
                 ? "bg-[#e0f0ff] self-end"
                 : "bg-white self-start"
             }`}
