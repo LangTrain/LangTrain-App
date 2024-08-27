@@ -1,8 +1,9 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Image } from "react-native";
 import { useEffect, useState } from "react";
 import { collection, query, where, getDocs, updateDoc, arrayRemove, deleteDoc, doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../../../firebase";
 import { Ionicons } from '@expo/vector-icons';
+import pic from "../../../assets/quiz/mistakes.png";
 
 export default MyMistakes = () => {
     const [displayName, setDisplayName] = useState(() => {
@@ -95,8 +96,13 @@ export default MyMistakes = () => {
             <ScrollView contentContainerStyle={{ padding: 20 }}>
                 <Text className="text-2xl font-bold mb-5">My Mistakes</Text>
                 {userMistakes.length === 0 ? (
-                    <Text className="text-lg text-gray-500">No mistakes found.</Text>
-                ) : (
+                    <View>
+                        
+                        <Text className="text-lg text-gray-500">No mistakes found.</Text>
+                        
+                    </View>
+                    
+                ) : ( 
                     userMistakes.map(({ id, mistakes }) => (
                         mistakes.map((mistake, index) => (
                             <View key={index} className="mb-4 p-4 bg-white rounded-lg shadow">
@@ -112,8 +118,19 @@ export default MyMistakes = () => {
                             </View>
                         ))
                     ))
+                    
+                    
                 )}
+
+                <Image
+                    source={pic}
+                    className="w-11/12 h-44 self-center"
+                    style={{ resizeMode: 'contain' }}
+                />
+                
+                
             </ScrollView>
+            
         </View>
     );
 };

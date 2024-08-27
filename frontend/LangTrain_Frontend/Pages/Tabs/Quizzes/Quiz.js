@@ -1,8 +1,9 @@
-import { Text, View, Pressable } from 'react-native';
+import { Text, View, Pressable, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useRoute } from '@react-navigation/native';
 import { db, auth } from '../../../firebase';
 import { collection, getDocs, addDoc, updateDoc, arrayUnion, query, where, doc } from 'firebase/firestore';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function Quiz({ navigation }) {
     const route = useRoute();
@@ -26,7 +27,7 @@ export default function Quiz({ navigation }) {
     const [firstSel, setFirstSel] = useState(true);
     const [score, setScore] = useState(0);
 
-    const [questionBank, setQuestionBank] = useState(null);
+    const [questionBank, setQuestionBank] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const [attemptHistory, setAttempHistory] = useState([]);
@@ -37,24 +38,19 @@ export default function Quiz({ navigation }) {
     
 
     const fetchQuestion = async () => {
-
-        let questions = []
-
+        let questions = [];
+    
         try {
             setLoading(true);
-            
+    
             if (topic == "navigate only difficulty") {
-                // console.log("navigate only difficulty:", difficulty)
                 const quizQuestionCollectionRef = collection(db, 'quizBank', difficulty, 'quizQuestion');
                 const querySnapshot = await getDocs(quizQuestionCollectionRef);
                 questions = querySnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data(),
                 }));
-            }
-            else {
-                // console.log("we have a topic:", topic)
-                
+            } else {
                 const quizQuestionCollectionRef = collection(db, 'quizBank', 'CreatedQuiz', topic);
                 const querySnapshot = await getDocs(quizQuestionCollectionRef);
                 questions = querySnapshot.docs.map(doc => ({
@@ -62,35 +58,44 @@ export default function Quiz({ navigation }) {
                     ...doc.data(),
                 }));
             }
-
+    
             questions = shuffleArray(questions);
-            // console.log(questions);
             setQuestionBank(questions);
-
-            let ques = questions[0].question;
-            setCurQues(ques);
-            let options = questions[0].options;
-            setCurOptions(options);
-            let ans = questions[0].correctAnswer;
-            setCurAns(ans);
-
+    
+            if (questions.length > 0) {
+                let ques = questions[0]?.question;
+                let options = questions[0]?.options;
+                let ans = questions[0]?.correctAnswer;
+    
+                if (ques && options && ans) {
+                    setCurQues(ques);
+                    setCurOptions(options);
+                    setCurAns(ans);
+                }
+            }
+    
         } catch (e) {
             console.error("Error fetching quiz data: ", e);
         } finally {
             setLoading(false);
         }
     };
+    
 
     useEffect(() => {
-        if (questionBank) {
-            let ques = questionBank[index].question;
-            setCurQues(ques);
-            let options = questionBank[index].options;
-            setCurOptions(options);
-            let ans = questionBank[index].correctAnswer;
-            setCurAns(ans);
+        if (questionBank.length > 0) {
+            let ques = questionBank[index]?.question;
+            let options = questionBank[index]?.options;
+            let ans = questionBank[index]?.correctAnswer;
+    
+            if (ques && options && ans) {
+                setCurQues(ques);
+                setCurOptions(options);
+                setCurAns(ans);
+            }
         }
-    }, [index]);
+    }, [index, questionBank]);
+    
 
     useEffect(() => {
         fetchQuestion();
@@ -230,16 +235,20 @@ const uploadAttemptHistory = async () => {
         <View className="flex-1 justify-center items-center bg-gray-100 p-5">
             {loading ? (
                 <View className="flex-1 justify-center items-center bg-gray-100">
-                    <Text className="text-2xl font-bold text-gray-800 mb-5">{difficulty} Mode</Text>
-                    <Text className="text-xl font-bold text-gray-800">Loading...</Text>
+                    <Text className="text-2xl font-bold text-gray-800 mb-5">{topic}</Text>
+                    <ActivityIndicator size="large" color="#0000ff" />
+                    <Text className="text-xl font-bold text-gray-800 mt-5">Loading...</Text>
                 </View>
             ) : submitting ? (
                 <View className="flex-1 justify-center items-center bg-gray-100">
-                    <Text className="text-xl font-bold text-gray-800">Submitting...</Text>
+                    <ActivityIndicator size="large" color="#0000ff" />
+                    <Text className="text-xl font-bold text-gray-800 mt-5">Submitting...</Text>
                 </View>
             ) : (
                 <>
-                    <Text className="text-2xl font-bold text-gray-800 mb-5">{difficulty} Mode</Text>
+                    <View className="flex-row items-center">
+                        <Text className="text-2xl font-bold text-gray-800 mb-5">{topic}</Text>
+                    </View>
                     
                     <Text className="text-xl text-gray-700 mb-5 text-center">{curQues}</Text>
 
@@ -263,22 +272,32 @@ const uploadAttemptHistory = async () => {
                         <Text className="text-white text-lg font-bold">Next</Text>
                     </Pressable>
 
-                    {/* Progress Bar */}
+                    
                     {
                         questionBank && (
                             <View className="w-full h-4 bg-gray-300 rounded-full mt-5 relative">
                                 <View 
                                     className="h-full bg-green-500 rounded-full"
-                                    style={{ width: `${((index) / (questionBank.length + 1)) * 100}%` }}
+                                    style={{ width: `${((index+1) / (questionBank.length)) * 100}%` }}
                                 />
                                 
                                 <View className="absolute w-full flex-row justify-between mt-7">
-                                    <Text className="text-black-500 text-base">{`${Math.round(((index) / (questionBank.length + 1)) * 100)}%`}</Text>
+                                    <Text className="text-black-500 text-base">{`${Math.round(((index+1) / (questionBank.length )) * 100)}%`}</Text>
                                     <Text className="text-black-500 text-base">{`${index + 1}/${questionBank.length}`}</Text>
                                 </View>
+
+                                
                             </View>
+                            
                         )
                     }
+
+                    <TouchableOpacity className="mt-3" onPress={() => Alert.alert(
+                            "Note",
+                            "Only your first option will be recorded as your choice. You can still freely explore other options after you select your first choice, but they won't be recorded."
+                        )}>
+                        <Ionicons name="information-circle-outline" size={34} color="blue" style={{ marginLeft: 8 }} />
+                    </TouchableOpacity>
 
                     
                     

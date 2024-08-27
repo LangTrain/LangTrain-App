@@ -27,6 +27,7 @@ const CreatedQuizesList = ({ navigation }) => {
                     return {
                         id: doc.id,
                         topic: data.topic,
+                        topicUpdate: data.topic.replace(/^Level[^-]* - /, ''),
                         difficulty: data.difficulty,
                     };
                 });
@@ -108,19 +109,19 @@ const CreatedQuizesList = ({ navigation }) => {
         <View className="flex-1 p-4 bg-gray-50">
             <Text className="text-xl font-bold mb-4">AI Generated Quiz Sets:</Text>
             <View className="flex-row items-center mb-4">
-                <TextInput
-                    value={query}
-                    onChangeText={setQuery}
-                    placeholder="Search by topic"
-                    className="flex-1 p-2 border border-gray-300 rounded-l-lg"
-                />
-                <Pressable
-                    onPress={handleSearch}
-                    className="p-2 bg-blue-500 rounded-r-lg"
-                >
-                    <Text className="text-white font-bold">Search</Text>
-                </Pressable>
-            </View>
+            <TextInput
+                value={query}
+                onChangeText={setQuery}
+                placeholder="Search by topic"
+                className="flex-1 p-4 border border-gray-300 rounded-l-lg"
+            />
+            <Pressable
+                onPress={handleSearch}
+                className="p-3 bg-blue-500 rounded-r-lg" // Increased padding for a bigger button
+            >
+                <Text className="text-white font-bold text-lg">🔍</Text> 
+            </Pressable>
+        </View>
             <View className="flex-row justify-between mb-4">
                 <Pressable
                     onPress={() => handleDifficultySelect("easy")}
@@ -159,7 +160,7 @@ const CreatedQuizesList = ({ navigation }) => {
                                 onPress={() => navigation.navigate("Quiz", { difficulty: item.difficulty, topic: item.topic })}
                                 className={`p-4 rounded-lg ${getDifficultyClasses(item.difficulty)}`}
                             >
-                                <Text className="text-lg font-bold">{item.topic}</Text>
+                                <Text className="text-lg font-bold">{item.topicUpdate}</Text>
                                 <Text className="text-md">Difficulty: {item.difficulty}</Text>
                             </Pressable>
                         </View>
