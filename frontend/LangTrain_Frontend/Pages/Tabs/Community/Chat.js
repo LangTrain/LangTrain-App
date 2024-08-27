@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, Text, TextInput, Button, FlatList, Image } from "react-native";
 import { db, auth, storage } from "../../../firebase";
 import {
@@ -9,8 +9,10 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { getDownloadURL, ref } from "firebase/storage";
+import ScrollToBottomButton from "../Shared/ScrollToBottomButton";
 
 const Chat = ({ route }) => {
+  const flatListRef = useRef(null);
   const { channelId } = route.params;
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
@@ -54,7 +56,9 @@ const Chat = ({ route }) => {
 
       await addDoc(collection(db, "channels", channelId, "messages"), {
         text: messageText,
-        sender: auth.currentUser.displayName || auth.currentUser.email,
+        sender:
+          auth.currentUser.displayName ||
+          auth.currentUser.email.match(/^([^@]+)/)[1],
         photoURL: photoURL,
         timestamp: new Date(),
       });
@@ -67,13 +71,14 @@ const Chat = ({ route }) => {
   return (
     <View className="flex-1 p-4 bg-[#f0f4f7]">
       <FlatList
+        ref={flatListRef}
         data={messages}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View
             className={`mb-2 p-4 rounded-lg flex-row items-center ${
               item.sender === auth.currentUser.displayName ||
-              item.sender === auth.currentUser.email
+              item.sender === auth.currentUser.email.match(/^([^@]+)/)[1]
                 ? "bg-[#e0f0ff] self-end"
                 : "bg-white self-start"
             }`}
@@ -87,6 +92,11 @@ const Chat = ({ route }) => {
             </Text>
           </View>
         )}
+      />
+      <ScrollToBottomButton
+        scrollViewRef={flatListRef}
+        messages={messages}
+        name={"community"}
       />
       <View className="flex-row items-center border-t border-[#ccc] p-2 bg-white">
         <TextInput
