@@ -16,6 +16,7 @@ import { fetchOpenAiResponse } from "./openAiApi"; // Import the API call functi
 import { auth, storage } from "../../../firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 import ScrollToBottomButton from "../Shared/ScrollToBottomButton";
+import { languageNames } from "./languages";
 
 const Chatbot = () => {
   const scrollViewRef = useRef(null);
@@ -56,11 +57,12 @@ const Chatbot = () => {
   const fetchVoices = async () => {
     try {
       const voices = await Speech.getAvailableVoicesAsync();
-      console.log("Available voices:", voices);
+      //console.log("Available voices:", voices);
 
       const filteredLanguages = voices.reduce((acc, voice) => {
         if (!acc.find((lang) => lang.code === voice.language)) {
-          acc.push({ label: voice.language, code: voice.language });
+          const languageName = languageNames[voice.language] || voice.language;
+          acc.push({ label: languageName, code: voice.language });
         }
         return acc;
       }, []);
@@ -245,10 +247,12 @@ const Chatbot = () => {
         animationType="slide"
         transparent={true}
       >
-        <View className="flex-1 justify-center items-center bg-sky-200 bg-opacity-50">
+        <View className="flex-1 justify-center items-center bg-sky-200 bg-opacity-50 ">
           <View className="bg-white w-4/5 rounded-lg p-5 max-h-3/4">
-            <Text className="text-lg text-[#353535] mb-3">Select Language</Text>
-            <ScrollView className="mb-3">
+            <ScrollView className="mb-3 overflow-scroll">
+              <Text className="text-lg text-[#353535] mb-3">
+                Select Language
+              </Text>
               {availableLanguages.map((language) => (
                 <TouchableOpacity
                   key={language.code}
@@ -263,22 +267,22 @@ const Chatbot = () => {
                   </Text>
                 </TouchableOpacity>
               ))}
+              <Button
+                title="Refresh"
+                onPress={refreshLanguages}
+                color="#5bc0de"
+              />
+              <Text className="text-xs text-center text-[#353535] mt-2">
+                Don't see the language you're looking for? Go to Phone settings
+                > Languages > Find option to download language packs > Download
+                pack for the language you'd like to learn (may vary per phone
+                but routine is similar), then click Refresh :)
+              </Text>
+              <Button
+                title="Close"
+                onPress={() => setLanguageModalVisible(false)}
+              />
             </ScrollView>
-            <Button
-              title="Refresh"
-              onPress={refreshLanguages}
-              color="#5bc0de"
-            />
-            <Text className="text-xs text-center text-[#353535] mt-2">
-              Don't see the language you're looking for? Go to Phone settings >
-              Languages > Find option to download language packs > Download pack
-              for the language you'd like to learn (may vary per phone but
-              routine is similar), then click Refresh :)
-            </Text>
-            <Button
-              title="Close"
-              onPress={() => setLanguageModalVisible(false)}
-            />
           </View>
         </View>
       </Modal>
