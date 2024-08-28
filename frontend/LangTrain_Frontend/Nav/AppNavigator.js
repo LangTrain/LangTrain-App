@@ -4,7 +4,6 @@ import { createStackNavigator } from "@react-navigation/stack";
 import AuthNavigator from "./AuthNavigator";
 import BottomTabsNavigator from "./BottomTabsNavigator";
 import { useAuth } from "../hooks/AuthProvider";
-import LessonWrapper from "../Pages/Tabs/Lessons/lesson_components/LessonWrapper";
 
 const Stack = createStackNavigator();
 
@@ -17,7 +16,6 @@ const AppNavigator = () => {
         {currentUser ? (
           <>
             <Stack.Screen name="Home" component={BottomTabsNavigator} />
-            <Stack.Screen name="LessonWrapper" component={LessonWrapper} />
           </>
         ) : (
           <Stack.Screen name="Auth" component={AuthNavigator} />

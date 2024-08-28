@@ -7,6 +7,8 @@ import { ProgressBar } from "react-native-paper";
 import SentenceDefinition from "./SentenceDefinition";
 import VocabDefinition from "./VocabDefinition";
 import { Audio } from "expo-av";
+import * as Speech from "expo-speech";
+import generateSpeech from "../pronounce_vocab";
 
 const LessonWrapper = ({ route, navigation }) => {
   // extract the vocab from the previous page
@@ -59,53 +61,34 @@ const LessonWrapper = ({ route, navigation }) => {
   const handlePlayAudio = async () => {
     const currentItem = parsedVocab[currentStep];
 
-    if (currentItem.audioBase64) {
+    if (currentItem.text) {
       try {
-        if (sound) {
-          await sound.unloadAsync();
-        }
-
-        const { sound: newSound } = await Audio.Sound.createAsync(
-          { uri: `data:audio/mp3;base64,${currentItem.audioBase64}` },
-          { shouldPlay: true }
-        );
-
-        setSound(newSound);
+        // Generate and play the speech
+        generateSpeech(currentItem.text);
       } catch (e) {
-        console.error("Failed to play audio: ", e);
+        console.error("Failed to generate and play speech: ", e);
       }
     } else {
-      console.log("No audio for this");
+      console.log("No text for this step");
     }
   };
 
   const handleSlowAudio = async () => {
     const currentItem = parsedVocab[currentStep];
 
-    if (currentItem.audioBase64) {
+    if (currentItem.text) {
       try {
-        // If there's already a sound object, unload it
-        if (sound) {
-          await sound.unloadAsync();
-        }
-
-        // Load the sound
-        const { sound: newSound } = await Audio.Sound.createAsync({
-          uri: `data:audio/mp3;base64,${currentItem.audioBase64}`,
+        // Generate and play the speech slowly
+        Speech.speak(currentItem.text, {
+          language: "zh-CN",
+          pitch: 1.0,
+          rate: 0.5, // Slow down the speech rate
         });
-
-        setSound(newSound); // Set the new sound object in state
-
-        // Set playback rate to 0.5 (slow)
-        await newSound.setRateAsync(0.5, true);
-
-        // Play the audio
-        await newSound.playAsync();
       } catch (e) {
-        console.error("Failed to play audio slowly: ", e);
+        console.error("Failed to generate and play speech slowly: ", e);
       }
     } else {
-      console.log("No audio for this step");
+      console.log("No text for this step");
     }
   };
 
