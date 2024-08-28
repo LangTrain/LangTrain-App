@@ -44,7 +44,7 @@ const FormInput: React.FC<FormInputProps> = ({
           placeholder={placeholder!}
           onChangeText={handleChangeText}
           secureTextEntry={
-            (title === "Password" || placeholder === "confirm password") &&
+            (title === "Password" || title === "Confirm Password") &&
             !showPassword
           }
         />

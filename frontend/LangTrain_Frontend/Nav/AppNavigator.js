@@ -10,12 +10,13 @@ const Stack = createStackNavigator();
 
 const AppNavigator = () => {
   const { currentUser } = useAuth();
+
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {currentUser ? (
           <>
-            <Stack.Screen name="HomeScreen" component={BottomTabsNavigator} />
+            <Stack.Screen name="Home" component={BottomTabsNavigator} />
             <Stack.Screen name="LessonWrapper" component={LessonWrapper} />
           </>
         ) : (

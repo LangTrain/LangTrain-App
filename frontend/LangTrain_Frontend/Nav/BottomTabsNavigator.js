@@ -3,10 +3,11 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import HomeScreen from "../Pages/HomeScreen";
-import Community from "../Pages/Tabs/Community";
 import Profile from "../Pages/Tabs/Profile";
 import Quizzes from "../Pages/Tabs/Quizzes";
 import Lessons from "../Pages/Tabs/Lessons";
+import CommunityStackNavigator from "./CommunityStackNavigator";
+import QuizStackNavigator from "./QuizStackNavigator";
 
 const Tab = createBottomTabNavigator();
 const tabScreens = [
@@ -15,6 +16,7 @@ const tabScreens = [
     component: HomeScreen,
     label: "LangTrain",
     icon: "owl",
+    show: true,
   },
 
   {
@@ -22,24 +24,28 @@ const tabScreens = [
     component: Lessons,
     label: "Lessons",
     icon: "school",
+    show: true,
   },
   {
     name: "Quizzes",
-    component: Quizzes,
+    component: QuizStackNavigator,
     label: "Quizzes",
     icon: "all-inclusive-box",
+    show: true,
   },
   {
-    name: "Community",
-    component: Community,
+    name: "Community_",
+    component: CommunityStackNavigator,
     label: "Community",
     icon: "chat-processing",
+    show: false,
   },
   {
     name: "Profile",
     component: Profile,
     label: "Profile",
     icon: "account",
+    show: true,
   },
   // Add more screens here as needed
 ];
@@ -66,7 +72,7 @@ const BottomTabsNavigator = () => {
                 size={size}
               />
             ),
-            headerShown: false,
+            headerShown: screen.show,
           }}
         />
       ))}

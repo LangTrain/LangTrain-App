@@ -12,6 +12,7 @@ import {
   FIREBASE_MEASUREMENT_ID,
 } from "./env";
 import { getFirestore } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import storage functions
 
 const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
@@ -32,6 +33,6 @@ const auth = initializeAuth(app, {
 });
 
 const db = getFirestore(app);
-
-export { auth, db };
+const storage = getStorage(app); // Initialize Firebase Storage
+export { auth, db, storage };
 export default app;

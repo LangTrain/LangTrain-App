@@ -1,12 +1,5 @@
 "use client";
-import {
-  View,
-  Text,
-  ScrollView,
-  Button,
-  TouchableOpacity,
-  Image,
-} from "react-native";
+import { View, ScrollView, TouchableOpacity, Image } from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
