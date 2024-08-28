@@ -6,7 +6,7 @@ import { db } from '../../../firebase';
 
 const ScoreReport = ({ navigation }) => {
     const route = useRoute();
-    const { score, attemptID } = route.params;
+    const { score, attemptID, topic, difficulty } = route.params;
 
     const [mistakes, setMistakes] = useState([]);
 
@@ -31,10 +31,10 @@ const ScoreReport = ({ navigation }) => {
 
     return (
         <SafeAreaView className="flex-1 bg-gray-100 p-4">
-            <Text className="text-2xl font-bold text-gray-800 mb-4 text-center">Score Report</Text>
+            <Text className="text-3xl font-bold text-gray-800 mb-4 mt-4 text-center">Score Report</Text>
             <ScrollView>
                 {mistakes.length === 0 ? (
-                    <Text className="text-lg text-gray-600 text-center">No mistakes recorded.</Text>
+                    <Text className="text-lg text-gray-600 text-center">Loading ...</Text>
                 ) : (
                     mistakes.map((mistake, index) => (
                         <View key={index} className="mb-4 p-3 bg-white rounded-lg shadow">
@@ -48,9 +48,13 @@ const ScoreReport = ({ navigation }) => {
                     ))
                 )}
             </ScrollView>
-            <View className="mt-4">
-                <Pressable className="bg-blue-500 py-3 px-6 rounded-md w-full items-center" onPress={() => navigation.navigate('QuizLevel')}>
-                    <Text className="text-white text-lg font-bold">Back to Quiz Level</Text>
+            <View className="flex-row justify-between mt-4 mb-5 px-4">
+                <Pressable className="bg-blue-500 py-3 px-6 rounded-md items-center flex-1 mr-2" onPress={() => navigation.navigate('QuizLevel')}>
+                    <Text className="text-white text-lg font-bold">Back</Text>
+                </Pressable>
+
+                <Pressable className="bg-green-500 py-3 px-6 rounded-md items-center flex-1" onPress={() => navigation.navigate('Quiz', {topic, difficulty})}>
+                    <Text className="text-white text-lg font-bold">Practice Again</Text>
                 </Pressable>
             </View>
         </SafeAreaView>

@@ -1,12 +1,22 @@
-import { Text, View, Pressable } from 'react-native';
+import { Text, View, Pressable, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useRoute } from '@react-navigation/native';
-import { db } from '../../../firebase';
-import { collection, getDocs, addDoc } from 'firebase/firestore';
+import { db, auth } from '../../../firebase';
+import { collection, getDocs, addDoc, updateDoc, arrayUnion, query, where, doc } from 'firebase/firestore';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function Quiz({ navigation }) {
     const route = useRoute();
-    const { difficulty } = route.params;
+
+    const [displayName, setDisplayName] = useState(() => {
+        // console.log("current user:")
+        // console.log(auth.currentUser.email)
+        return auth.currentUser
+          ? auth.currentUser.displayName || "Unknown User"
+          : "Unknown User";
+      });
+
+    const { difficulty, topic } = route.params;
 
     const [index, setIndex] = useState(0);
     const [curQues, setCurQues] = useState('');
@@ -17,50 +27,75 @@ export default function Quiz({ navigation }) {
     const [firstSel, setFirstSel] = useState(true);
     const [score, setScore] = useState(0);
 
-    const [questionBank, setQuestionBank] = useState(null);
+    const [questionBank, setQuestionBank] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const [attemptHistory, setAttempHistory] = useState([]);
     const [submitting, setSubmitting] = useState(false);
 
+    const [userMistakes, setUserMistakes] = useState([]);
+
+    
+
     const fetchQuestion = async () => {
+        let questions = [];
+    
         try {
             setLoading(true);
-            const quizQuestionCollectionRef = collection(db, 'quizBank', difficulty, 'quizQuestion');
-            const querySnapshot = await getDocs(quizQuestionCollectionRef);
-            let questions = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data(),
-            }));
-
+    
+            if (topic == "navigate only difficulty") {
+                const quizQuestionCollectionRef = collection(db, 'quizBank', difficulty, 'quizQuestion');
+                const querySnapshot = await getDocs(quizQuestionCollectionRef);
+                questions = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+            } else {
+                const quizQuestionCollectionRef = collection(db, 'quizBank', 'CreatedQuiz', topic);
+                const querySnapshot = await getDocs(quizQuestionCollectionRef);
+                questions = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+            }
+    
             questions = shuffleArray(questions);
-            // console.log(questions);
             setQuestionBank(questions);
-
-            let ques = questions[0].question;
-            setCurQues(ques);
-            let options = questions[0].options;
-            setCurOptions(options);
-            let ans = questions[0].correctAnswer;
-            setCurAns(ans);
-
+    
+            if (questions.length > 0) {
+                let ques = questions[0]?.question;
+                let options = questions[0]?.options;
+                let ans = questions[0]?.correctAnswer;
+    
+                if (ques && options && ans) {
+                    setCurQues(ques);
+                    setCurOptions(options);
+                    setCurAns(ans);
+                }
+            }
+    
         } catch (e) {
             console.error("Error fetching quiz data: ", e);
         } finally {
             setLoading(false);
         }
     };
+    
 
     useEffect(() => {
-        if (questionBank) {
-            let ques = questionBank[index].question;
-            setCurQues(ques);
-            let options = questionBank[index].options;
-            setCurOptions(options);
-            let ans = questionBank[index].correctAnswer;
-            setCurAns(ans);
+        if (questionBank.length > 0) {
+            let ques = questionBank[index]?.question;
+            let options = questionBank[index]?.options;
+            let ans = questionBank[index]?.correctAnswer;
+    
+            if (ques && options && ans) {
+                setCurQues(ques);
+                setCurOptions(options);
+                setCurAns(ans);
+            }
         }
-    }, [index]);
+    }, [index, questionBank]);
+    
 
     useEffect(() => {
         fetchQuestion();
@@ -80,6 +115,18 @@ export default function Quiz({ navigation }) {
         // if we are making our first choice, we update our score and 
         // add to our attempt history
         if (firstSel) {
+            // if user made a mistake, we want to add to error state
+            if (option !== curAns) {
+                setUserMistakes([
+                    ...userMistakes,
+                    {
+                        question: curQues,
+                        correctAnswer: curAns,
+                        selectedAnswer: option,
+                    },
+                ]);
+            }
+
             if (option === curAns) {
                 setScore(score + 1);
             }
@@ -112,7 +159,9 @@ export default function Quiz({ navigation }) {
             navigation.navigate('Result', {
                 score,
                 totalQuestions: questionBank.length,
-                attemptID: docId
+                attemptID: docId,
+                topic,
+                difficulty
             });
     
             setIndex(0);
@@ -123,37 +172,84 @@ export default function Quiz({ navigation }) {
         }
     };
     
-    const uploadAttemptHistory = async () => {
-        setSubmitting(true);
-        try {
-            const docRef = await addDoc(collection(db, 'attemptHistory'), {
-                attempts: attemptHistory,
+
+const uploadAttemptHistory = async () => {
+    setSubmitting(true);
+    try {
+        // Always upload the attempt history
+        const docRef = await addDoc(collection(db, 'attemptHistory'), {
+            attempts: attemptHistory,
+            timestamp: new Date(),
+        });
+
+        const userEmail = auth.currentUser?.email;
+        
+        // Query to find if the user already has a document in 'userMistakes'
+        const mistakesQuery = query(
+            collection(db, 'userMistakes'),
+            where('userEmail', '==', userEmail)
+        );
+        const querySnapshot = await getDocs(mistakesQuery);
+
+        if (!querySnapshot.empty) {
+            // If the document exists, update it with the new mistakes
+            const docId = querySnapshot.docs[0].id;
+            const docRef = doc(db, 'userMistakes', docId);
+
+            // Check for duplicate mistakes before adding
+            const existingMistakes = querySnapshot.docs[0].data().mistakes;
+
+            const newMistakes = userMistakes.filter(mistake => 
+                !existingMistakes.some(existingMistake =>
+                    existingMistake.question === mistake.question &&
+                    existingMistake.correctAnswer === mistake.correctAnswer &&
+                    existingMistake.selectedAnswer === mistake.selectedAnswer
+                )
+            );
+
+            if (newMistakes.length > 0) {
+                await updateDoc(docRef, {
+                    mistakes: arrayUnion(...newMistakes),
+                    timestamp: new Date(),
+                });
+            }
+        } else {
+            // If no document exists, create a new one
+            await addDoc(collection(db, 'userMistakes'), {
+                userEmail,
+                mistakes: userMistakes,
                 timestamp: new Date(),
             });
-            return docRef.id;
-        } catch (e) {
-            console.error("Error adding document: ", e);
-        } finally {
-            setSubmitting(false);
         }
-    };
-    
+
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding document: ", e);
+    } finally {
+        setSubmitting(false);
+    }
+};
+
 
     return (
         <View className="flex-1 justify-center items-center bg-gray-100 p-5">
             {loading ? (
                 <View className="flex-1 justify-center items-center bg-gray-100">
-                    <Text className="text-2xl font-bold text-gray-800 mb-5">{difficulty} Mode</Text>
-                    <Text className="text-xl font-bold text-gray-800">Loading...</Text>
+                    <Text className="text-2xl font-bold text-gray-800 mb-5">{topic}</Text>
+                    <ActivityIndicator size="large" color="#0000ff" />
+                    <Text className="text-xl font-bold text-gray-800 mt-5">Loading...</Text>
                 </View>
             ) : submitting ? (
                 <View className="flex-1 justify-center items-center bg-gray-100">
-                    <Text className="text-xl font-bold text-gray-800">Submitting...</Text>
+                    <ActivityIndicator size="large" color="#0000ff" />
+                    <Text className="text-xl font-bold text-gray-800 mt-5">Submitting...</Text>
                 </View>
             ) : (
                 <>
-                    <Text className="text-2xl font-bold text-gray-800 mb-5">{difficulty} Mode</Text>
-
+                    <View className="flex-row items-center">
+                        <Text className="text-2xl font-bold text-gray-800 mb-5">{topic}</Text>
+                    </View>
+                    
                     <Text className="text-xl text-gray-700 mb-5 text-center">{curQues}</Text>
 
                     <View className="w-full items-center">
@@ -175,6 +271,36 @@ export default function Quiz({ navigation }) {
                     >
                         <Text className="text-white text-lg font-bold">Next</Text>
                     </Pressable>
+
+                    
+                    {
+                        questionBank && (
+                            <View className="w-full h-4 bg-gray-300 rounded-full mt-5 relative">
+                                <View 
+                                    className="h-full bg-green-500 rounded-full"
+                                    style={{ width: `${((index+1) / (questionBank.length)) * 100}%` }}
+                                />
+                                
+                                <View className="absolute w-full flex-row justify-between mt-7">
+                                    <Text className="text-black-500 text-base">{`${Math.round(((index+1) / (questionBank.length )) * 100)}%`}</Text>
+                                    <Text className="text-black-500 text-base">{`${index + 1}/${questionBank.length}`}</Text>
+                                </View>
+
+                                
+                            </View>
+                            
+                        )
+                    }
+
+                    <TouchableOpacity className="mt-3" onPress={() => Alert.alert(
+                            "Note",
+                            "Only your first option will be recorded as your choice. You can still freely explore other options after you select your first choice, but they won't be recorded."
+                        )}>
+                        <Ionicons name="information-circle-outline" size={34} color="blue" style={{ marginLeft: 8 }} />
+                    </TouchableOpacity>
+
+                    
+                    
                 </>
             )}
         </View>
