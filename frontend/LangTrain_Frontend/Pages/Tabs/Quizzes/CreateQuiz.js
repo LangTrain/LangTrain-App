@@ -53,7 +53,7 @@ const CreateQuiz = ({ navigation }) => {
                                 Loading...
                             </Text>
                             <Text className="mt-2 text-base text-gray-600 text-center">
-                                It may take up to 1 minute for the quiz to be generated. 
+                                It may take up to 20-30 seconds for the quiz to be generated. 
                                 Please wait patiently.
                             </Text>
                         </View>
