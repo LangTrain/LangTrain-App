@@ -14,7 +14,9 @@ const AppNavigator = () => {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {currentUser ? (
-          <Stack.Screen name="Home" component={BottomTabsNavigator} />
+          <>
+            <Stack.Screen name="Home" component={BottomTabsNavigator} />
+          </>
         ) : (
           <Stack.Screen name="Auth" component={AuthNavigator} />
         )}

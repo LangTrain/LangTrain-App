@@ -8,6 +8,7 @@ import Quizzes from "../Pages/Tabs/Quizzes";
 import Lessons from "../Pages/Tabs/Lessons";
 import CommunityStackNavigator from "./CommunityStackNavigator";
 import QuizStackNavigator from "./QuizStackNavigator";
+import LessonsNavigator from "./LessonsNavigator";
 
 const Tab = createBottomTabNavigator();
 const tabScreens = [
@@ -20,11 +21,11 @@ const tabScreens = [
   },
 
   {
-    name: "Lessons",
-    component: Lessons,
-    label: "Lessons",
+    name: "Lesson",
+    component: LessonsNavigator,
+    label: "Lesson",
     icon: "school",
-    show: true,
+    show: false,
   },
   {
     name: "Quizzes",
