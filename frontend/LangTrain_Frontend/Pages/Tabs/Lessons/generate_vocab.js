@@ -47,93 +47,93 @@ const fetchVocab = async (topic, difficulty) => {
   }
 
   const sysPrompt = `
-        You are a mandarin teacher. You take in text from a user and generate a lesson plan based on the user's input. 
+        You are a mandarin teacher. You take in text from a user and generate a lesson plan based on the user's input.
         Make sure to create exactly 5 vocabulary for the user to learn based on the ${topic} topic and ${difficulty} difficulty. Also create 1 sentence per vocabulary word and a quiz at the end of the lesson.
-        You should return only the vocabulary words, definitions, and pinyin (space between each word), sentence, and quiz in the following JSON format: 
+        You should return only the vocabulary words, definitions, and pinyin (space between each word), sentence, and quiz in the following JSON format:
         {
             "vocabulary" : [
               {
-                "text": "word1", 
-                "definition": "definition1", 
-                "pinyin": "pinyin1", 
+                "text": "word1",
+                "definition": "definition1",
+                "pinyin": "pinyin1",
                 "sentence": {
-                  "text": "sentence_text1", 
-                  "translation": "sentence_translation1", 
+                  "text": "sentence_text1",
+                  "translation": "sentence_translation1",
                   "pinyin": "sentence_pinyin1"
-                }, 
+                },
                 "quiz":[
                   {
-                    "question": "What does word1 mean?", 
-                    "options: ["option1", "option2", "option3", "correctOption"], 
+                    "question": "What does word1 mean?",
+                    "options: ["option1", "option2", "option3", "correctOption"],
                     "correctAnswer": "correctOption"
                   }
                 ]
               },
               {
-                "text": "word2", 
-                "definition": 
-                "definition2", 
-                "pinyin": "pinyin2", 
+                "text": "word2",
+                "definition":
+                "definition2",
+                "pinyin": "pinyin2",
                 "sentence": {
-                  "text": "sentence_text2", 
-                  "translation": "sentence_translation2", 
+                  "text": "sentence_text2",
+                  "translation": "sentence_translation2",
                   "pinyin": "sentence_pinyin2"
                 },
                 "quiz":[
                   {
-                    "question": "What does word2 mean?", 
-                    "options: ["option1", "option2", "option3", "correctOption"], 
+                    "question": "What does word2 mean?",
+                    "options: ["option1", "option2", "option3", "correctOption"],
                     "correctAnswer": "correctOption"
                   }
                 ]
               },
               {
-                "text": "word3", 
-                "definition": "definition3", 
-                "pinyin": "pinyin3", 
+                "text": "word3",
+                "definition": "definition3",
+                "pinyin": "pinyin3",
                 "sentence": {
-                  "text": "sentence_text3", 
-                  "translation": "sentence_translation3", 
+                  "text": "sentence_text3",
+                  "translation": "sentence_translation3",
                   "pinyin": "sentence_pinyin3"
                 },
                 "quiz":[
                   {
-                    "question": "What does word3 mean?", 
-                    "options: ["option1", "option2", "option3", "correctOption"], 
+                    "question": "What does word3 mean?",
+                    "options: ["option1", "option2", "option3", "correctOption"],
                     "correctAnswer": "correctOption"
                   }
                 ]
               },
               {
-                "text": "word4", 
-                "definition": "definition4", 
-                "pinyin": "pinyin4", 
+                "text": "word4",
+                "definition": "definition4",
+                "pinyin": "pinyin4",
                 "sentence": {
                   "text": "sentence_text4",
                   "translation": "sentence_translation4",
                   "pinyin": "sentence_pinyin4"
-                }, 
+                },
                 "quiz":[
                   {
-                    "question": "What does word4 mean?", 
-                    "options: ["option1", "option2", "option3", "correctOption"], 
+                    "question": "What does word4 mean?",
+                    "options: ["option1", "option2", "option3", "correctOption"],
                     "correctAnswer": "correctOption"
                   }
                 ]
               },
               {
-                "text": "word5", 
-                "definition": "definition5",  
-                "pinyin": "pinyin5", 
+                "text": "word5",
+                "definition": "definition5",
+                "pinyin": "pinyin5",
                 "sentence": {
-                  "text": "sentence_text5", 
-                  "translation": "sentence_translation5", 
+                  "text": "sentence_text5",
+                  "translation": "sentence_translation5",
                   "pinyin": "sentence_pinyin5"
                 },
                 "quiz":[
                   {
-                    "question": "What does word5 mean?", 
-                    "options: ["option1", "option2", "option3", "correctOption"], 
+                    "question": "What does word5 mean?",
+                    "options: ["option1", "option2", "option3", "correctOption"],
                     "correctAnswer": "correctOption"
                   }
                 ]
@@ -171,16 +171,15 @@ const fetchVocab = async (topic, difficulty) => {
 
     const vocabWithAudioUrls = await Promise.all(
       parsed_json.vocabulary.map(async (vocab) => {
-        const wordAudioPath = await generateSpeech(vocab.text);
-        const sentenceAudioBase64 = await generateSpeech(vocab.sentence.text);
+        //const wordAudioPath = await generateSpeech(vocab.text);
+        //const sentenceAudioBase64 = await generateSpeech(vocab.sentence.text);
         const wordImage = await getImages(vocab.definition);
         return {
           ...vocab,
-          audioBase64: wordAudioPath,
+          //audioBase64: wordAudioPath,
           image: wordImage,
           sentence: {
             ...vocab.sentence,
-            audioBase64: sentenceAudioBase64,
             image: wordImage,
           },
         };
