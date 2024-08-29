@@ -2,6 +2,13 @@ import { Text, View, Pressable, Image } from "react-native";
 import LevelBottom from "../../../assets/quiz/LevelBottom.png";
 import React from "react";
 
+/*
+  Note for Quiz features:
+  if admin wants to delete the quiz from firestore,
+  we first need to find quizBank/CreatedQuiz/{your topic name}
+  after that we STILL need to go to GeneratedQuizMetaInfo/{the document that has your topic under topic variable}
+*/
+
 export default function QuizLevel({ navigation }) {
   const handlePress = (difficulty) => {
     // Navigate to the quiz screen with the selected difficulty

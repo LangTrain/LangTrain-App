@@ -94,7 +94,7 @@ export default MyMistakes = () => {
                 </View>
             )}
             <ScrollView contentContainerStyle={{ padding: 20 }}>
-                <Text className="text-2xl font-bold mb-5">My Mistakes</Text>
+                <Text className="text-2xl font-bold mb-5">🛠️ My Mistakes</Text>
                 {userMistakes.length === 0 ? (
                     <View>
                         
