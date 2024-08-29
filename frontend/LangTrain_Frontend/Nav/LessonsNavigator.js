@@ -10,7 +10,11 @@ const LessonsNavigator = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Lessons" component={Lessons} />
-      <Stack.Screen name="LessonWrapper" component={LessonWrapper} />
+      <Stack.Screen
+        name="LessonWrapper"
+        component={LessonWrapper}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };

@@ -8,6 +8,7 @@ import {
   Modal,
   Image,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import chineseLearn from "../../../assets/lessons_head_image.jpg";
@@ -30,6 +31,13 @@ const Lessons = ({ navigation }) => {
   ]);
 
   const handleGenerateLesson = async () => {
+    //error handling
+
+    if (!topic) {
+      Alert.alert("Please enter a topic");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const generatedVocab = await fetchVocab(topic, value);
@@ -47,28 +55,22 @@ const Lessons = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView className="bg-white">
+    <View className="bg-white flex-1">
       {isLoading ? (
-        <View className="h-screen w-full items-center my-auto justify-center">
+        <View className="flex-1 w-full items-center my-auto justify-center">
           <ActivityIndicator size="large" color="#0000ff" />
           <Text className="text-lg">Loading...</Text>
         </View>
       ) : (
-        <ScrollView className="h-screen bg-white w-full flex flex-col pb-2">
-          <View
-            id="lessons-header-container"
-            className="mt-8 items-center w-full h-11/12"
-          >
+        <View className="flex-1 container bg-white w-full flex-col">
+          <View id="lessons-header-container" className="items-center w-full">
             <Text className="text-2xl items-center font-bold">
               Learn Mandarin Your Way
             </Text>
 
-            <Image
-              source={chineseLearn}
-              className="w-full h-full mt-4 object-fit"
-            />
+            <Image source={chineseLearn} className="w-full mt-4" />
           </View>
-          <View className="mt-10 w-full">
+          <View className="w-full">
             <Text className="ml-8 text-xl font-semibold">
               Create your own lesson
             </Text>
@@ -97,9 +99,9 @@ const Lessons = ({ navigation }) => {
               handlePress={handleGenerateLesson}
             />
           </View>
-        </ScrollView>
+        </View>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

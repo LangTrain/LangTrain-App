@@ -23,7 +23,7 @@ const LessonWrapper = ({ route, navigation }) => {
         type: "definition",
         text: item.text,
         pinyin: item.pinyin,
-        definition: item.definition,
+        definition: item.translation,
         audioBase64: item.audioBase64,
         image: item.image,
       });

@@ -14,6 +14,14 @@ import generateSpeech from "./pronounce_vocab";
 import getImages from "./get_images";
 import * as FileSystem from "expo-file-system";
 
+const cleanChineseText = (text) => {
+  // Regex to match only Chinese characters
+  const chineseCharacterRegex = /[\u4e00-\u9fa5]+/g;
+  // Match and join all Chinese characters in the text
+  const cleanedText = text.match(chineseCharacterRegex)?.join("") || "";
+  return cleanedText;
+};
+
 const fetchVocab = async (topic, difficulty) => {
   console.log("Starting fetchVocab with: ", topic, difficulty);
 
@@ -32,11 +40,8 @@ const fetchVocab = async (topic, difficulty) => {
 
     const querySnapshot = await getDocs(q);
 
-    console.log(querySnapshot);
-
     if (!querySnapshot.empty) {
       const matchingLesson = querySnapshot.docs[0].data();
-      console.log("Found existing lesson in firestore: ", matchingLesson);
       return matchingLesson.vocabulary;
     } else {
       console.log("No matching lesson found");
@@ -49,12 +54,16 @@ const fetchVocab = async (topic, difficulty) => {
   const sysPrompt = `
         You are a mandarin teacher. You take in text from a user and generate a lesson plan based on the user's input.
         Make sure to create exactly 5 vocabulary for the user to learn based on the ${topic} topic and ${difficulty} difficulty. Also create 1 sentence per vocabulary word and a quiz at the end of the lesson.
-        You should return only the vocabulary words, definitions, and pinyin (space between each word), sentence, and quiz in the following JSON format:
+        Here are the following rules for the formatting of the lesson fields: 
+        1. Vocabulary text should be in Chinese characters only. 
+        2. Translation should only be in English. 
+        3. Pinyin should be in Chinese pinyin with spaces between each word and tone accents on the correct letters. 
+        You should return only the vocabulary text, translation (ENGLISH), and pinyin (space between each word), sentence, and quiz in the following JSON format:
         {
             "vocabulary" : [
               {
                 "text": "word1",
-                "definition": "definition1",
+                "translation": "definition1",
                 "pinyin": "pinyin1",
                 "sentence": {
                   "text": "sentence_text1",
@@ -71,8 +80,7 @@ const fetchVocab = async (topic, difficulty) => {
               },
               {
                 "text": "word2",
-                "definition":
-                "definition2",
+                "translation":"definition2",
                 "pinyin": "pinyin2",
                 "sentence": {
                   "text": "sentence_text2",
@@ -89,7 +97,7 @@ const fetchVocab = async (topic, difficulty) => {
               },
               {
                 "text": "word3",
-                "definition": "definition3",
+                "translation": "definition3",
                 "pinyin": "pinyin3",
                 "sentence": {
                   "text": "sentence_text3",
@@ -106,7 +114,7 @@ const fetchVocab = async (topic, difficulty) => {
               },
               {
                 "text": "word4",
-                "definition": "definition4",
+                "translation": "definition4",
                 "pinyin": "pinyin4",
                 "sentence": {
                   "text": "sentence_text4",
@@ -123,7 +131,7 @@ const fetchVocab = async (topic, difficulty) => {
               },
               {
                 "text": "word5",
-                "definition": "definition5",
+                "translation": "definition5",
                 "pinyin": "pinyin5",
                 "sentence": {
                   "text": "sentence_text5",
@@ -169,11 +177,22 @@ const fetchVocab = async (topic, difficulty) => {
 
     const parsed_json = JSON.parse(response.data.choices[0].message.content);
 
+    const cleanedVocab = parsed_json.vocabulary.map((vocab) => {
+      return {
+        ...vocab,
+        text: cleanChineseText(vocab.text),
+        sentence: {
+          ...vocab.sentence,
+          text: cleanChineseText(vocab.sentence.text),
+        }, // Clean the text field
+      };
+    });
+
     const vocabWithAudioUrls = await Promise.all(
-      parsed_json.vocabulary.map(async (vocab) => {
+      cleanedVocab.map(async (vocab) => {
         //const wordAudioPath = await generateSpeech(vocab.text);
         //const sentenceAudioBase64 = await generateSpeech(vocab.sentence.text);
-        const wordImage = await getImages(vocab.definition);
+        const wordImage = await getImages(vocab.translation);
         return {
           ...vocab,
           //audioBase64: wordAudioPath,
