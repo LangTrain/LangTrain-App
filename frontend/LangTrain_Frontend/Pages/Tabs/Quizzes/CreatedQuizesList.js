@@ -107,7 +107,7 @@ const CreatedQuizesList = ({ navigation }) => {
 
     return (
         <View className="flex-1 p-4 bg-gray-50">
-            <Text className="text-xl font-bold mb-4">AI Generated Quiz Sets:</Text>
+            <Text className="text-xl font-bold mb-4">🤖 AI Generated Quiz Sets</Text>
             <View className="flex-row items-center mb-4">
             <TextInput
                 value={query}

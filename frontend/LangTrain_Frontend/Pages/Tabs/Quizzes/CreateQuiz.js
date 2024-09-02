@@ -1,50 +1,62 @@
-import { View, Text, Pressable, ActivityIndicator, TextInput, ScrollView, TouchableOpacity } from "react-native";
+import { Image, View, Text, Pressable, ActivityIndicator, TextInput, ScrollView, TouchableOpacity } from "react-native";
 import { useState } from 'react';
 import generateQuiz from "./OpenAICreateQuizAPI";
-import { Picker } from '@react-native-picker/picker';
+import CreateBottom from "../../../assets/quiz/CreateBottom.png";
 
 const CreateQuiz = ({ navigation }) => {
     const [input, setInput] = useState("");
     const [difficulty, setDifficulty] = useState("easy");
-    const [count, setCount] = useState("5"); // Default count value
+    const [count, setCount] = useState("5");
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async () => {
-        // console.log("Topic:", input);
-        // console.log("Difficulty:", difficulty);
-        // console.log("Count:", count);
+        if (input == ""){
+            alert("You must enter a topic!");
+            return;
+        }
+
         let updateInput = `Level ${difficulty} - ${input}`;
         setLoading(true);
-        const response = await generateQuiz(updateInput, difficulty, parseInt(count)); // Pass count as number
+        const response = await generateQuiz(updateInput, difficulty, parseInt(count));
 
         setLoading(false);
 
         if (response.status === "success") {
-            // Navigate to QuizPage and pass quiz data as parameters
             navigation.navigate('Quiz', { topic: updateInput });
         } else {
-            // Handle error (e.g., show an alert)
             console.error(response.message);
         }
     };
 
-    // Function to get background color based on count
     const getCountBackgroundColor = (selectedCount) => {
         switch (selectedCount) {
             case "3":
-                return 'bg-green-500'; // Green for 3
+                return 'bg-green-500';
             case "5":
-                return 'bg-yellow-500'; // Yellow for 5
+                return 'bg-yellow-500';
             case "10":
-                return 'bg-red-500'; // Red for 10
+                return 'bg-red-500';
             default:
-                return 'bg-gray-300'; // Gray for unselected
+                return 'bg-gray-300';
+        }
+    };
+
+    const getDifficultyBackgroundColor = (selectedDifficulty) => {
+        switch (selectedDifficulty) {
+            case "easy":
+                return 'bg-blue-400';
+            case "medium":
+                return 'bg-purple-300';
+            case "hard":
+                return 'bg-pink-400';
+            default:
+                return 'bg-gray-300';
         }
     };
 
     return (
         <View className="flex-1 p-4 bg-gray-100">
-            <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
+            <ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
                 {
                     loading ? (
                         <View className="flex-1 justify-center items-center bg-gray-100 p-4">
@@ -60,12 +72,12 @@ const CreateQuiz = ({ navigation }) => {
                     ) : (
                         <View className="items-center">
                             <Text className="text-3xl font-bold text-gray-800 mb-5 mt-3 text-center">
-                                Create Your Own Quiz!
+                                🧑‍🎨️ Create Your Own Quiz
                             </Text>
 
                             {/* Topic Title */}
                             <Text className="text-2xl font-semibold text-gray-700 mb-2">
-                                Topics
+                                📖 Topics
                             </Text>
                             <TextInput
                                 className="w-full border border-gray-300 rounded-lg px-4 py-2 text-base mb-4"
@@ -76,23 +88,32 @@ const CreateQuiz = ({ navigation }) => {
 
                             {/* Difficulty Title */}
                             <Text className="text-2xl font-semibold text-gray-700 mb-2">
-                                Difficulty
+                                🧰 Difficulty
                             </Text>
-                            <View className="w-full border border-gray-300 rounded-lg mb-4">
-                                <Picker
-                                    selectedValue={difficulty}
-                                    onValueChange={(itemValue) => setDifficulty(itemValue)}
-                                    className="h-32"
+                            <View className="w-full flex-row justify-between mb-4">
+                                <TouchableOpacity
+                                    onPress={() => setDifficulty("easy")}
+                                    className={`flex-1 p-4 m-1 rounded-lg ${getDifficultyBackgroundColor(difficulty === "easy" ? "easy" : "")}`}
                                 >
-                                    <Picker.Item label="Easy" value="easy" />
-                                    <Picker.Item label="Medium" value="medium" />
-                                    <Picker.Item label="Hard" value="hard" />
-                                </Picker>
+                                    <Text className="text-center text-white font-bold text-2xl">Easy</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={() => setDifficulty("medium")}
+                                    className={`flex-1 p-4 m-1 rounded-lg ${getDifficultyBackgroundColor(difficulty === "medium" ? "medium" : "")}`}
+                                >
+                                    <Text className="text-center text-white font-bold text-xl">Medium</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={() => setDifficulty("hard")}
+                                    className={`flex-1 p-4 m-1 rounded-lg ${getDifficultyBackgroundColor(difficulty === "hard" ? "hard" : "")}`}
+                                >
+                                    <Text className="text-center text-white font-bold text-2xl">Hard</Text>
+                                </TouchableOpacity>
                             </View>
 
                             {/* Count Title */}
                             <Text className="text-2xl font-semibold text-gray-700 mb-2">
-                                Number of Questions
+                                🔢 Number of Questions
                             </Text>
                             <View className="w-full flex-row justify-between mb-4">
                                 <TouchableOpacity
@@ -119,6 +140,12 @@ const CreateQuiz = ({ navigation }) => {
                             <Pressable className="bg-blue-500 py-4 px-8 rounded-md my-2 w-4/5 items-center" onPress={handleSubmit}>
                                 <Text className="text-white text-lg font-bold">Submit!</Text>
                             </Pressable>
+
+                            <Image
+                                source={CreateBottom}
+                                className=" h-60 self-center"
+                                style={{ resizeMode: 'contain' }}
+                            />
                         </View>
                     )
                 }
