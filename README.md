@@ -2,7 +2,7 @@
 
 LangTrain is an innovative language learning app that empowers users to take control of their language journey. With LangTrain, you decide the difficulty level and topics you want to learn. Our app leverages OpenAI's technology to provide personalized lessons and quizzes tailored specifically to your preferences and skill level. Engage with interactive content designed just for you, test your skills with level-matched quizzes, and connect with a global community of learners to enhance your learning experience.
 
-Here's a quick [demonstration](https://www.linkedin.com/posts/hlin_softwareengineering-ai-teaching-activity-7236469249987219457-hAUs?utm_source=share&utm_medium=member_desktop) video.
+Here's a quick [demonstration](https://www.youtube.com/watch?v=sMpO4HBXUq0) video.
 
 
 ## Features
